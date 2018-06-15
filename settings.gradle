@@ -15,4 +15,4 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'ZemiB2017'
+rootProject.name = 'ZemiA2018'
