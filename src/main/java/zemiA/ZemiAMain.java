@@ -32,7 +32,7 @@ public class ZemiAMain {
       return;
     }
 
-    final ZemiAVisitor visitor = new ZemiAVisitor();
+    final ZemiAVisitor visitor = new ZemiAVisitor(unit);
     unit.accept(visitor);
   }
 }
