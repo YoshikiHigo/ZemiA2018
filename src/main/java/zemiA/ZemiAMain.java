@@ -12,18 +12,36 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 public class ZemiAMain {
 
   public static void main(final String[] args) {
-    List<String> lines = null;
+    List<String> lines1 = null;
+    List<String> lines2 = null;
     try {
-      lines = Files.readAllLines(Paths.get("src/main/java/zemiA/ZemiAVisitor.java"),
+      lines1 = Files.readAllLines(Paths.get("src/main/java/zemiA/ZemiAVisitor.java"),
           StandardCharsets.ISO_8859_1);
     } catch (final Exception e) {
       System.err.println(e.getMessage());
       return;
     }
+    
+    
+    
+    
+    try {
+        lines2 = Files.readAllLines(Paths.get("src/main/java/zemiA/ZemiAMain.java"),
+            StandardCharsets.ISO_8859_1);
+      } catch (final Exception e) {
+        System.err.println(e.getMessage());
+        return;
+      }
+    
+    lines1.addAll(lines2);
+    
 
     final ASTParser parser = ASTParser.newParser(AST.JLS10);
-    parser.setSource(String.join(System.lineSeparator(), lines).toCharArray());
+    parser.setSource(String.join(System.lineSeparator(), lines2).toCharArray());
 
+    
+    
+    
     CompilationUnit unit = null;
     try {
       unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
