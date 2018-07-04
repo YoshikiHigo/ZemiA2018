@@ -27,66 +27,65 @@ public class ZemiAMain {
 	@SuppressWarnings("unchecked")
 	public static void main(final String[] args) {
 
-		String input = "src/main/java/zemiA/ZemiAMain.java";
-		final File inputFile = new File(input);
+		String srcDirectory = "src/main/java/zemiA/";
 
-		if (classpathEntries.isEmpty()) {
-			final String systemLibraries = System.getProperty("java.class.path");
-			//final String externalLibraries = config.hasLIBRARY() ? config.getLIBRARY() : "";
-			final String externalLibraries = "";
-			classpathEntries.addAll(Arrays.asList(systemLibraries.split(File.pathSeparator)));
-			classpathEntries.addAll(Arrays.asList(externalLibraries.split(File.pathSeparator)));
-		}
+		for(String file: new File(srcDirectory).list()) {
+			final File inputFile = new File(srcDirectory+file);
 
-		try {
-
-			/*String text = FileUtils.readFileToString(inputFile, Charset.defaultCharset());*/
-			// charset: encoding
-
-			String text = readAll(inputFile.getAbsolutePath());
-			final Document document = new Document(text);
-
-			if (input.endsWith(".java")) {
-
-				final ASTParser parser = ASTParser.newParser(AST.JLS10);
-				//parser.setSource(String.join(System.lineSeparator(), lines).toCharArray());
-				parser.setSource(document.get().toCharArray());
-				parser.setUnitName(input);
-				parser.setKind(ASTParser.K_COMPILATION_UNIT);
-				parser.setResolveBindings(true);
-				parser.setBindingsRecovery(true);
-				parser.setStatementsRecovery(true);
-
-				if (sourceDirectories.isEmpty()) {
-					sourceDirectories.add(inputFile.getParentFile().getAbsolutePath());
-				}
-
-				parser.setEnvironment(classpathEntries.toArray(new String[0]),
-						sourceDirectories.toArray(new String[0]), null, true);
-
-				final Map<String, String> options = DefaultCodeFormatterConstants.getEclipseDefaultSettings();
-				options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_8);
-				options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_8);
-				options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
-
-				parser.setCompilerOptions(options);
-
-				final CompilationUnit unit = (CompilationUnit) parser.createAST(null);
-				//final AST ast = unit.getAST();
-				//final ASTRewrite rewriter = ASTRewrite.create(ast);
-				unit.recordModifications();
-
-				final ZemiAVisitor visitor = new ZemiAVisitor();
-				unit.accept(visitor);
-
-//				System.out.println(visitor.getCINT());
-//				System.out.println(visitor.getCDISP());
-//				System.out.println(visitor.getMaxNesting());
-				System.out.println(visitor.isIntensiveCoupling());
-				System.out.println(visitor.isDispersedCoupling());
+			if (classpathEntries.isEmpty()) {
+				final String systemLibraries = System.getProperty("java.class.path");
+				//final String externalLibraries = config.hasLIBRARY() ? config.getLIBRARY() : "";
+				final String externalLibraries = "";
+				classpathEntries.addAll(Arrays.asList(systemLibraries.split(File.pathSeparator)));
+				classpathEntries.addAll(Arrays.asList(externalLibraries.split(File.pathSeparator)));
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+
+			try {
+
+				/*String text = FileUtils.readFileToString(inputFile, Charset.defaultCharset());*/
+				// charset: encoding
+
+				if (file.endsWith(".java")) {
+					String text = readAll(inputFile.getAbsolutePath());
+					final Document document = new Document(text);
+
+					final ASTParser parser = ASTParser.newParser(AST.JLS10);
+					//parser.setSource(String.join(System.lineSeparator(), lines).toCharArray());
+					parser.setSource(document.get().toCharArray());
+					parser.setUnitName(file);
+					parser.setKind(ASTParser.K_COMPILATION_UNIT);
+					parser.setResolveBindings(true);
+					parser.setBindingsRecovery(true);
+					parser.setStatementsRecovery(true);
+
+					if (sourceDirectories.isEmpty()) {
+						sourceDirectories.add(inputFile.getParentFile().getAbsolutePath());
+					}
+
+					parser.setEnvironment(classpathEntries.toArray(new String[0]),
+							sourceDirectories.toArray(new String[0]), null, true);
+
+					final Map<String, String> options = DefaultCodeFormatterConstants.getEclipseDefaultSettings();
+					options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_8);
+					options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_8);
+					options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
+
+					parser.setCompilerOptions(options);
+
+					final CompilationUnit unit = (CompilationUnit) parser.createAST(null);
+					//final AST ast = unit.getAST();
+					//final ASTRewrite rewriter = ASTRewrite.create(ast);
+					unit.recordModifications();
+
+					final ZemiAVisitor visitor = new ZemiAVisitor();
+					unit.accept(visitor);
+
+					printImformations(visitor);
+
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -94,6 +93,16 @@ public class ZemiAMain {
 	private static String readAll(final String path) throws IOException {
 		return Files.lines(Paths.get(path), Charset.forName("UTF-8"))
 				.collect(Collectors.joining(System.getProperty("line.separator")));
+	}
+
+	private static void printImformations(ZemiAVisitor visitor) {
+		System.out.println("Class name: "+ visitor.getClassName());
+		System.out.println("CINT: " + visitor.getCINT());
+		System.out.println("CDISP: " + visitor.getCDISP());
+		System.out.println("MAXNESTING: " + visitor.getMaxNesting());
+		System.out.println("intensive coupling: " + visitor.isIntensiveCoupling());
+		System.out.println("dispersed coupling: " + visitor.isDispersedCoupling());
+		System.out.println("");
 	}
 }
 
