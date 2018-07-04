@@ -14,10 +14,12 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 public class ZemiAVisitor extends ASTVisitor {
 
 	private int cint = 0;	//the number of distinct method invocation
+	private MethodDeclaration[] methods;
 	private Hashtable<IMethodBinding,ITypeBinding> table = new Hashtable<IMethodBinding,ITypeBinding>();
 	private double cdisp = 0;	//the number of class which define called method devided by CINT
 	private int nesting = 0;
 	private int maxNesting = 0;
+
 
 	@Override
 	public boolean visit(SimpleName node) {
@@ -26,37 +28,31 @@ public class ZemiAVisitor extends ASTVisitor {
 	}
 
 	@Override
-	public void endVisit(TypeDeclaration node) {
-		//System.out.println(node.getName());
-		super.endVisit(node);
-	}
-
-	@Override
-	public boolean visit(MethodDeclaration node) {
-		//System.out.println(node.toString());
+	public boolean visit(TypeDeclaration node) {
+		methods = node.getMethods();
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(MethodInvocation node) {
 		//System.out.println(node.toString());
-		/* invoked method is distinct method -> cint++ */
-
 		IMethodBinding bind = node.resolveMethodBinding();
-		//System.out.println(node.resolveMethodBinding().getName());
-		System.out.println(bind.getDeclaringClass().getName());
-
-		if(isDistinctMethod(node)) {
+		if(isDistinctMethod(bind)) {
 			cint++;
 			table.put(bind,bind.getDeclaringClass());
 		}
 		return super.visit(node);
 	}
 
-	private boolean isDistinctMethod(MethodInvocation node) {
-
-		return true;  //Developping
+	private boolean isDistinctMethod(IMethodBinding bind) {
+		boolean internalMethodFlag = false;
+		for(MethodDeclaration m: methods) {
+			internalMethodFlag = internalMethodFlag || m.resolveBinding().equals(bind);
+			if(internalMethodFlag == true) break;
+		}
+		return !internalMethodFlag;
 	}
+
 	@Override
 	public boolean visit(Block node) {
 		nesting++;
@@ -77,7 +73,9 @@ public class ZemiAVisitor extends ASTVisitor {
 	}
 
 	public double getCDISP() {
-		cdisp = table.size() / cint;
+		if(cint != 0) {
+			cdisp = (double)table.size() / cint;
+		}
 		return cdisp;
 	}
 

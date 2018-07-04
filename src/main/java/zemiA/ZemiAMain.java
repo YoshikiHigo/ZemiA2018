@@ -42,6 +42,7 @@ public class ZemiAMain {
 
 			/*String text = FileUtils.readFileToString(inputFile, Charset.defaultCharset());*/
 			// charset: encoding
+
 			String text = readAll(inputFile.getAbsolutePath());
 			final Document document = new Document(text);
 
@@ -78,6 +79,11 @@ public class ZemiAMain {
 				final ZemiAVisitor visitor = new ZemiAVisitor();
 				unit.accept(visitor);
 
+//				System.out.println(visitor.getCINT());
+//				System.out.println(visitor.getCDISP());
+//				System.out.println(visitor.getMaxNesting());
+				System.out.println(visitor.isIntensiveCoupling());
+				System.out.println(visitor.isDispersedCoupling());
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
