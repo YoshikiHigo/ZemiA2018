@@ -28,7 +28,7 @@ public class ch7Visitor extends ASTVisitor {
 	List<String> pmlist = new ArrayList<String>();//public methods
 	List<String> islist = new ArrayList<String>();//inheritance-specific members
 	List<String> isusedlist = new ArrayList<String>();//inheritance-specific members used
-	List<ch7Data> cDataList = new ArrayList<ch7Data>();
+	List<ch7Data> cDataList = new ArrayList<ch7Data>();//data for each method 
 	ch7Data cData;
 	double sumofNOM=0;
 	double sumofWMC=0;
