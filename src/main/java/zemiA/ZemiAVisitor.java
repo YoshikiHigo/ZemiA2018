@@ -1,17 +1,14 @@
 package zemiA;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -24,21 +21,43 @@ public class ZemiAVisitor extends ASTVisitor {
 	private int nesting = 0;
 	private int maxNesting = 0;
 	private List<IMethodBinding> methods = new ArrayList<IMethodBinding>();
-	private Hashtable<String,ITypeBinding> table = new Hashtable<String,ITypeBinding>();
-	private List<IBinding> imports = new LinkedList<IBinding>();
+	private Hashtable<String,ITypeBinding> classTable = new Hashtable<String,ITypeBinding>();
+	private List<IMethodBinding> allMethods;
+
+	public ZemiAVisitor() {
+		super();
+
+		//allMethods = a;
+	}
 
 	@Override
-	public boolean visit(ImportDeclaration node) {
-		//System.out.println(node.getName().toString());
-		imports.add(node.resolveBinding());
-		return super.visit(node);
+	public void endVisit(CompilationUnit node) {
+		// TODO 自動生成されたメソッド・スタブ
+		allMethods.addAll(methods);
+		// printClassImformations
+		System.out.println("Class name: "+ getClassName());
+		System.out.println("CINT: " + getCINT());
+		System.out.println("CDISP: " + getCDISP());
+//		Enumeration<ITypeBinding> elements = classTable.elements();
+//		while(elements.hasMoreElements()) {
+//			System.out.println(elements.nextElement().getName().toString());
+//		}
+		System.out.println("MAXNESTING: " + getMaxNesting());
+		System.out.println("intensive coupling: " + isIntensiveCoupling());
+		System.out.println("dispersed coupling: " + isDispersedCoupling());
+//		for(IMethodBinding m: allMethods){
+//			System.out.println(m.getName().toString());
+//		}
+		System.out.println("");
+
+		super.endVisit(node);
 	}
 
 	@Override
 	public boolean visit(TypeDeclaration node) {
 		className = node.getName().toString();
-		for(MethodDeclaration md : Arrays.asList(node.getMethods())) {
-			methods.add(md.resolveBinding());
+		for(MethodDeclaration mb: node.getMethods()) {
+			methods.add(mb.resolveBinding());
 		}
 		return super.visit(node);
 	}
@@ -46,10 +65,20 @@ public class ZemiAVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(MethodInvocation node) {
 		//System.out.println(node.toString());
-		IMethodBinding bind = node.resolveMethodBinding();
-		if(isDistinctMethod(bind) && isProjectMethod(bind)) {
+		IMethodBinding methodBind = node.resolveMethodBinding();
+		ITypeBinding classBind = methodBind.getDeclaringClass();
+		String className = classBind.getName().toString();
+		if(isDistinctMethod(methodBind) && isProjectMethod(methodBind)) {
 			cint++;
-			table.put(node.getName().toString(),bind.getDeclaringClass());
+			classTable.put(className,classBind);
+
+			/***************************************/
+			boolean a;
+			for(IMethodBinding b: allMethods) {
+				a = node.resolveMethodBinding().equals(b);
+				if(a)System.out.println(node.getName().toString()+a);
+			}
+			/**************************************/
 		}
 		return super.visit(node);
 	}
@@ -61,12 +90,7 @@ public class ZemiAVisitor extends ASTVisitor {
 
 	/*always return true: Developping...*/
 	private boolean isProjectMethod(IMethodBinding bind) {
-		boolean importFlag = false;
-		IBinding binding = bind;
-		for(IBinding b: imports) {
-			importFlag = binding.isEqualTo(b);
-		}
-		return !importFlag;
+		return allMethods.contains(bind);
 	}
 
 	@Override
@@ -94,7 +118,7 @@ public class ZemiAVisitor extends ASTVisitor {
 
 	public double getCDISP() {
 		if(cint != 0) {
-			cdisp = (double)table.size() / cint;
+			cdisp = (double)classTable.size() / cint;
 		}
 		return cdisp;
 	}
@@ -115,5 +139,19 @@ public class ZemiAVisitor extends ASTVisitor {
 		boolean dispersedCoupling = getCINT()>7 && getCDISP()>=1/2;
 		boolean deepNesting = getMaxNesting()>3;
 		return dispersedCoupling && deepNesting;
+	}
+
+	public List<MethodInformation> getShotgunSurgeryMethodList(){
+		List<MethodInformation> shotgunSergeryMethods = new ArrayList<MethodInformation>();
+//		MethodInformation ms;
+//		Enumeration<MethodInformation> elements = invocatedMethods.elements();
+//		while(elements.hasMoreElements()) {
+//			ms = elements.nextElement();
+//			//System.out.println(mb.getMethodBinding().getName().toString() + mb.getCC());
+//			if(ms.getCC()>7 && ms.getCC()>5) {
+//				shotgunSergeryMethods.add(ms);
+//			}
+//		}
+		return shotgunSergeryMethods;
 	}
 }
