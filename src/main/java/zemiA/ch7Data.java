@@ -20,8 +20,6 @@ public class ch7Data {
 	List<MethodDeclaration> md = new ArrayList<MethodDeclaration>();//method list
 	List<MethodDeclaration> pmd = new ArrayList<MethodDeclaration>();//public method list
 	List<MethodDeclaration> ismlist = new ArrayList<MethodDeclaration>();//public or protected method list
-	//List<MethodDeclaration> ismusedlist = new ArrayList<MethodDeclaration>();
 	List<FieldDeclaration> alist = new ArrayList<FieldDeclaration>();//fieldlist
 	List<FieldDeclaration> isalist = new ArrayList<FieldDeclaration>();//public or protected field list
-	//List<FieldDeclaration> isausedlist = new ArrayList<FieldDeclaration>();
 }

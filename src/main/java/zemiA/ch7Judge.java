@@ -17,10 +17,13 @@ public class ch7Judge extends ASTVisitor{
 	ch7Data cData, pData;
 	List<String> usedSuperFields;
 	List<IMethodBinding> usedSuperMethods;
-			
+	double aveNOM, aveWMC, aveAMW;
 	
-	ch7Judge(List<ch7Data> list) {
+	ch7Judge(List<ch7Data> list, double NOM, double WMC, double AMW) {
 		ch7Data = list;
+		aveNOM=NOM;
+		aveWMC=WMC;
+		aveAMW=AMW;
 	}
 	@Override
 	public boolean visit(TypeDeclaration node) {
@@ -32,9 +35,7 @@ public class ch7Judge extends ASTVisitor{
 		
 		for(ch7Data Data : ch7Data) {
 			if(node.getName().toString().matches(Data.name)) cData = Data;
-			else if(node.getSuperclassType()!=null && node.getSuperclassType().toString().matches(Data.name)) {
-				pData = Data;
-			}
+			else if(node.getSuperclassType()!=null && node.getSuperclassType().toString().matches(Data.name)) pData = Data;
 		}
 		
 		if(cData.NOM != 0) cData.AMW = cData.CYCLO/(double)cData.NOM;
@@ -78,12 +79,21 @@ public class ch7Judge extends ASTVisitor{
 	@Override
 	public void endVisit(TypeDeclaration node) {
 		// TODO Auto-generated method stub
-		if(pData != null) {
+		if(pData != null) 
 		cData.BUR = (double)(usedSuperFields.size() + usedSuperMethods.size())/(double)(pData.isalist.size() + pData.ismlist.size());
-		System.out.println(usedSuperFields);
-		System.out.println(usedSuperMethods);
-		}
+		
 		System.out.println("BUR:"+cData.BUR);
+		
+		if(pData != null) {
+			if(((cData.NProtM > 3 && cData.BUR < (double)1/3) || cData.BOvR < (double)1/3)
+					&& ((cData.AMW > aveAMW || cData.CYCLO > aveWMC) && cData.NOM > aveNOM)) System.out.println("Refused Parent Bequest");
+			if((cData.NAS >= aveNOM && cData.PNAS < (double)2/3)
+					&& ((cData.AMW > aveAMW || cData.CYCLO >= 2*aveWMC) && cData.NOM >= 3*aveNOM/2)
+					&& (pData.AMW > aveAMW && pData.NOM > 3*aveNOM/4 && cData.CYCLO >= aveWMC)) System.out.println("Tradition Breaker");
+		}
+		
+		
+		System.out.println();
 		super.endVisit(node);
 	}
 	@Override

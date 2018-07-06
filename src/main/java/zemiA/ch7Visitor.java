@@ -30,6 +30,9 @@ public class ch7Visitor extends ASTVisitor {
 	List<String> isusedlist = new ArrayList<String>();//inheritance-specific members used
 	List<ch7Data> cDataList = new ArrayList<ch7Data>();
 	ch7Data cData;
+	double sumofNOM=0;
+	double sumofWMC=0;
+	double aveNOM=0, aveWMC=0, aveAMW=0;
 	
 	
 	@Override
@@ -45,7 +48,6 @@ public class ch7Visitor extends ASTVisitor {
 		}
 		MethodDeclaration[] m = node.getMethods();
 		cData.md.addAll(Arrays.asList(m));
-		
 		return super.visit(node);
 	}
 
@@ -54,6 +56,8 @@ public class ch7Visitor extends ASTVisitor {
 	public void endVisit(TypeDeclaration node) {
 		// TODO Auto-generated method stub
 		cDataList.add(cData);
+		sumofNOM+=cData.NOM;
+		sumofWMC+=cData.CYCLO;
 		super.endVisit(node);
 	}
 
@@ -61,8 +65,10 @@ public class ch7Visitor extends ASTVisitor {
 	@Override
 	public void endVisit(CompilationUnit node) {
 		// TODO Auto-generated method stub
-		node.accept(new ch7Judge(cDataList));
-		
+		aveNOM=sumofNOM/cDataList.size();
+		aveWMC=sumofWMC/cDataList.size();
+		aveAMW=(sumofWMC/sumofNOM)/cDataList.size();
+		node.accept(new ch7Judge(cDataList, aveNOM, aveWMC, aveAMW));
 		super.endVisit(node);
 	}
 
