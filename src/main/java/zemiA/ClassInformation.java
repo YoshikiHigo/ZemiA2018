@@ -30,11 +30,12 @@ public class ClassInformation {
 	}
 
 	public double getCDISP() {
-		HashMap<String,ITypeBinding> invokedClasses = new HashMap<String,ITypeBinding>();
+		HashMap<ITypeBinding,Integer> invokedClasses = new HashMap<ITypeBinding,Integer>();
 		for(IMethodBinding invokedMethod: invokedMethods) {
 			ITypeBinding invokedClassBind = invokedMethod.getDeclaringClass();
-			String invokedClassName = invokedClassBind.getName().toString();
-			invokedClasses.put(invokedClassName,invokedClassBind);
+			Integer i = invokedClasses.get(invokedClassBind);
+			i = i==null? 0 : i;  //if i==null: first invocation
+			invokedClasses.put(invokedClassBind,++i);
 		}
 		if(cint != 0) {
 			cdisp = (double)invokedClasses.size() / cint;
@@ -93,7 +94,7 @@ public class ClassInformation {
 		System.out.println("intensive coupling: " + isIntensiveCoupling());
 		System.out.println("dispersed coupling: " + isDispersedCoupling());
 
-		// to refactoring
+		// for refactoring
 //		System.out.println("invocate method list");
 //		for(IMethodBinding invokedMethod: invokedMethods) {
 //			String invokedClassName = invokedMethod.getDeclaringClass().getName().toString();

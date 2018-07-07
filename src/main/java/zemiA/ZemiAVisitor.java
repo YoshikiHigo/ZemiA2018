@@ -39,7 +39,6 @@ public class ZemiAVisitor extends ASTVisitor {
 			IMethodBinding invokedMethodBind = invokedMethod.resolveMethodBinding();
 			IMethodBinding invokingMethodBind = allInvokingMethods.get(invokedMethod).resolveBinding();
 			ClassInformation invokingClass = getClassInformation(invokingMethodBind.getDeclaringClass());
-
 			if(isDistinctMethod(invokingClass, invokedMethodBind) && isProjectMethod(invokedMethodBind)) {
 				invokingClass.invocate(invokedMethodBind);
 				getMethodInformation(invokedMethodBind).invocated(invokingMethodBind);
@@ -47,15 +46,16 @@ public class ZemiAVisitor extends ASTVisitor {
 		}
 
 		// Print Class Informations
+		System.out.println("print class informations: ");
 		for(ClassInformation classInformation: allDeclaratedClasses) {
 			classInformation.printClassInformation();
 		}
 
 		// Print Project Information
-		System.out.println("Project: ");
-		System.out.println("shotgun surgery method: ");
+		System.out.println("shotgun surgery method list: ");
 		for(MethodInformation m: getShotgunSurgeryMethodList()) {
-			System.out.println(m.getMethodBinding().getName().toString());
+			System.out.println(m.getMethodBinding().getName().toString()); //why this line comment out cause bag?
+			m.printMethodInfomation();
 		}
 		super.endVisit(node);
 	}

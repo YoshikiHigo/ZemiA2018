@@ -11,7 +11,7 @@ public class MethodInformation{
 	private IMethodBinding methodBind;
 	private int cm = 0;
 	private int cc = 0;
-	private List<ITypeBinding> invokingClasses = new ArrayList<ITypeBinding>();
+	private List<IMethodBinding> invokingMethods = new ArrayList<IMethodBinding>();
 
 	public MethodInformation(IMethodBinding declaratedMethodBind) {
 		methodBind = declaratedMethodBind;
@@ -19,8 +19,7 @@ public class MethodInformation{
 
 	// setter
 	public void invocated(IMethodBinding invokingMethodBind) {
-		ITypeBinding defineClass = invokingMethodBind.getDeclaringClass();
-		invokingClasses.add(defineClass);
+		invokingMethods.add(invokingMethodBind);
 		cm++;
 	}
 
@@ -31,22 +30,36 @@ public class MethodInformation{
 
 	// CC: number of class which define CM method
 	public int getCC() {
-		HashMap<String,ITypeBinding> classes = new HashMap<String,ITypeBinding>();
-		for(ITypeBinding invokingclass: invokingClasses) {
-			classes.put(invokingclass.getName().toString(),invokingclass);
+		HashMap<ITypeBinding,Integer> invokingClassesList = new HashMap<ITypeBinding,Integer>();
+		for(IMethodBinding invokingMethodBind: invokingMethods) {
+			Integer i = invokingClassesList.get(invokingMethodBind.getDeclaringClass());
+			i = i==null? 0 : i;  //if i==null: first invocation
+			invokingClassesList.put(invokingMethodBind.getDeclaringClass(),++i);
 		}
-		cc = classes.size();
+		cc = invokingClassesList.size();
 		return cc;
 	}
 
 	public boolean isShotgunSurgery() {
 		// CM > ShortMemoryCapacity 7
 		// CC > MANY 4
-		return getCM()>7 && getCC()>4;
+		return getCM()>2 && getCC()>0;
 	}
 
 	public IMethodBinding getMethodBinding() {
 		return methodBind;
+	}
+
+	public void printMethodInfomation(){
+		System.out.println(methodBind.getDeclaringClass().getName().toString() +": "+ methodBind.getName().toString());
+		System.out.println("CM: " + getCM());
+		System.out.println("CC: " + getCC());
+
+		// for refactoring
+		for(IMethodBinding method: invokingMethods) {
+			System.out.println(method.getDeclaringClass().getName().toString() +":"+ method.getName().toString());
+		}
+		System.out.println("");
 	}
 
 }
