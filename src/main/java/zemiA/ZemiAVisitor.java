@@ -1,8 +1,9 @@
 package zemiA;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
@@ -14,83 +15,130 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 public class ZemiAVisitor extends ASTVisitor {
+	/*
+	 *  This class search java class's tree over the project
+	 *  endVisit(TypeDeclaration): finish searching previous class's tree and prepare to serch next class's tree
+	 *  endVidit(CompilationUnit): finish searching java project
+	 */
 
-	private String className;
-	private int cint = 0;	//the number of distinct method invocation
-	private double cdisp = 0;	//the number of class which define called method devided by CINT
 	private int nesting = 0;
 	private int maxNesting = 0;
-	private List<IMethodBinding> methods = new ArrayList<IMethodBinding>();
-	private Hashtable<String,ITypeBinding> classTable = new Hashtable<String,ITypeBinding>();
-	private List<IMethodBinding> allMethods;
-
-	public ZemiAVisitor() {
-		super();
-
-		//allMethods = a;
-	}
+	private List<IMethodBinding> classMethods;
+	private List<MethodInformation> allDeclaratedMethods = new ArrayList<MethodInformation>();
+	private List<MethodInvocation> allInvokedMethods = new ArrayList<MethodInvocation>();
+	private HashMap<MethodInvocation,MethodDeclaration> allInvokingMethods =
+			new HashMap<MethodInvocation,MethodDeclaration>();  //method invocation is unique
+	private Stack<MethodDeclaration> methodDeclarationStack = new Stack<MethodDeclaration>();
+	private List<ClassInformation> allDeclaratedClasses = new ArrayList<ClassInformation>();
+	private List<MethodInformation> shotgunSurgeryMethods = new ArrayList<MethodInformation>();
 
 	@Override
 	public void endVisit(CompilationUnit node) {
-		// TODO 自動生成されたメソッド・スタブ
-		allMethods.addAll(methods);
-		// printClassImformations
-		System.out.println("Class name: "+ getClassName());
-		System.out.println("CINT: " + getCINT());
-		System.out.println("CDISP: " + getCDISP());
-//		Enumeration<ITypeBinding> elements = classTable.elements();
-//		while(elements.hasMoreElements()) {
-//			System.out.println(elements.nextElement().getName().toString());
-//		}
-		System.out.println("MAXNESTING: " + getMaxNesting());
-		System.out.println("intensive coupling: " + isIntensiveCoupling());
-		System.out.println("dispersed coupling: " + isDispersedCoupling());
-//		for(IMethodBinding m: allMethods){
-//			System.out.println(m.getName().toString());
-//		}
-		System.out.println("");
+		// Judgement
+		for(MethodInvocation invokedMethod: allInvokedMethods) {
+			IMethodBinding invokedMethodBind = invokedMethod.resolveMethodBinding();
+			IMethodBinding invokingMethodBind = allInvokingMethods.get(invokedMethod).resolveBinding();
+			ClassInformation invokingClass = getClassInformation(invokingMethodBind.getDeclaringClass());
 
+			if(isDistinctMethod(invokingClass, invokedMethodBind) && isProjectMethod(invokedMethodBind)) {
+				invokingClass.invocate(invokedMethodBind);
+				getMethodInformation(invokedMethodBind).invocated(invokingMethodBind);
+			}
+		}
+
+		// Print Class Informations
+		for(ClassInformation classInformation: allDeclaratedClasses) {
+			classInformation.printClassInformation();
+		}
+
+		// Print Project Information
+		System.out.println("Project: ");
+		System.out.println("shotgun surgery method: ");
+		for(MethodInformation m: getShotgunSurgeryMethodList()) {
+			System.out.println(m.getMethodBinding().getName().toString());
+		}
 		super.endVisit(node);
+	}
+
+	private boolean isDistinctMethod(ClassInformation invokingClass, IMethodBinding methodBind) {
+		// if distinct method contains() returns false
+		 List<IMethodBinding> invokingClassMethods = invokingClass.getMethodsList();
+		return !invokingClassMethods.contains(methodBind);
+	}
+
+	/*always return false: Developping...*/
+	private boolean isProjectMethod(IMethodBinding methodBind) {
+		boolean includeFlag = false;
+		for(MethodInformation declaratedMethod: allDeclaratedMethods) {
+			includeFlag = declaratedMethod.getMethodBinding().equals(methodBind);
+			if(includeFlag == true) {
+				break;
+			}
+		}
+		return includeFlag;
+	}
+
+	private MethodInformation getMethodInformation(IMethodBinding methodBind) {
+		for(MethodInformation methodInformation: allDeclaratedMethods) {
+			if(methodInformation.getMethodBinding().equals(methodBind)) {
+				return methodInformation;
+			}
+		}
+		// if the method is not project method
+		return null;
+	}
+
+	private ClassInformation getClassInformation(ITypeBinding classBind) {
+		for(ClassInformation classInformation: allDeclaratedClasses) {
+			if(classInformation.getClassBinding().equals(classBind)) {
+				return classInformation;
+			}
+		}
+		return null;
 	}
 
 	@Override
 	public boolean visit(TypeDeclaration node) {
-		className = node.getName().toString();
+		// prepare to search next class :Initialize
+		maxNesting = 0;
+		classMethods = new ArrayList<IMethodBinding>();
+		allDeclaratedClasses.add(new ClassInformation(node.resolveBinding()));
+
 		for(MethodDeclaration mb: node.getMethods()) {
-			methods.add(mb.resolveBinding());
+			classMethods.add(mb.resolveBinding());
+			allDeclaratedMethods.add(new MethodInformation(mb.resolveBinding()));
 		}
 		return super.visit(node);
 	}
 
 	@Override
-	public boolean visit(MethodInvocation node) {
-		//System.out.println(node.toString());
-		IMethodBinding methodBind = node.resolveMethodBinding();
-		ITypeBinding classBind = methodBind.getDeclaringClass();
-		String className = classBind.getName().toString();
-		if(isDistinctMethod(methodBind) && isProjectMethod(methodBind)) {
-			cint++;
-			classTable.put(className,classBind);
+	public void endVisit(TypeDeclaration node) {
+		// set searched class information
+		ClassInformation searchedClass = getClassInformation(node.resolveBinding());
+		searchedClass.setMethodList(classMethods);
+		searchedClass.setMaxNesting(maxNesting);
+		super.endVisit(node);
+	}
 
-			/***************************************/
-			boolean a;
-			for(IMethodBinding b: allMethods) {
-				a = node.resolveMethodBinding().equals(b);
-				if(a)System.out.println(node.getName().toString()+a);
-			}
-			/**************************************/
-		}
+	@Override
+	public boolean visit(MethodDeclaration node) {
+		// to access from MethodInvocation to MethodDeclaration
+		methodDeclarationStack.push(node);
 		return super.visit(node);
 	}
 
-	private boolean isDistinctMethod(IMethodBinding bind) {
-		// if distinct method contains() returns false
-		return !methods.contains(bind);
+	@Override
+	public void endVisit(MethodDeclaration node) {
+		// to access from MethodInvocation to MethodDeclaration
+		methodDeclarationStack.pop();
+		super.endVisit(node);
 	}
 
-	/*always return true: Developping...*/
-	private boolean isProjectMethod(IMethodBinding bind) {
-		return allMethods.contains(bind);
+	@Override
+	public boolean visit(MethodInvocation node) {
+		allInvokedMethods.add(node);
+		allInvokingMethods.put(node, methodDeclarationStack.peek());
+		return super.visit(node);
 	}
 
 	@Override
@@ -108,50 +156,13 @@ public class ZemiAVisitor extends ASTVisitor {
 		super.endVisit(node);
 	}
 
-	public String getClassName() {
-		return className;
-	}
-
-	public int getCINT() {
-		return cint;
-	}
-
-	public double getCDISP() {
-		if(cint != 0) {
-			cdisp = (double)classTable.size() / cint;
-		}
-		return cdisp;
-	}
-
-	public int getMaxNesting() {
-		//maxNesting include method difinition block
-		return maxNesting - 1;
-	}
-
-	public boolean isIntensiveCoupling() {
-		boolean intensiveCoupling1 = getCINT()>7 && getCDISP()<1/2;
-		boolean intensiveCoupling2 = getCINT()>3 && getCDISP()<1/4;
-		boolean deepNesting = getMaxNesting()>3;
-		return (intensiveCoupling1 || intensiveCoupling2) && deepNesting;
-	}
-
-	public boolean isDispersedCoupling() {
-		boolean dispersedCoupling = getCINT()>7 && getCDISP()>=1/2;
-		boolean deepNesting = getMaxNesting()>3;
-		return dispersedCoupling && deepNesting;
-	}
-
 	public List<MethodInformation> getShotgunSurgeryMethodList(){
-		List<MethodInformation> shotgunSergeryMethods = new ArrayList<MethodInformation>();
-//		MethodInformation ms;
-//		Enumeration<MethodInformation> elements = invocatedMethods.elements();
-//		while(elements.hasMoreElements()) {
-//			ms = elements.nextElement();
-//			//System.out.println(mb.getMethodBinding().getName().toString() + mb.getCC());
-//			if(ms.getCC()>7 && ms.getCC()>5) {
-//				shotgunSergeryMethods.add(ms);
-//			}
-//		}
-		return shotgunSergeryMethods;
+		for(MethodInformation methodInformation: allDeclaratedMethods) {
+			if(methodInformation.isShotgunSurgery()) {
+				shotgunSurgeryMethods.add(methodInformation);
+			}
+		}
+		return shotgunSurgeryMethods;
 	}
+
 }

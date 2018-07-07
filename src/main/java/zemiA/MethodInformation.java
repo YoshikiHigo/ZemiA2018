@@ -1,33 +1,27 @@
 package zemiA;
 
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 
 public class MethodInformation{
-	private MethodInvocation node;
+	private IMethodBinding methodBind;
 	private int cm = 0;
 	private int cc = 0;
-	private Hashtable<String,ASTNode> classes = new Hashtable<String,ASTNode>();
+	private List<ITypeBinding> invokingClasses = new ArrayList<ITypeBinding>();
 
-	public MethodInformation(MethodInvocation m) {
-		node = m;
+	public MethodInformation(IMethodBinding declaratedMethodBind) {
+		methodBind = declaratedMethodBind;
 	}
 
-	void invocated(MethodInvocation m) {
-		classes.put(m.getExpression().resolveTypeBinding().getName().toString(),m.getRoot());
-		
+	// setter
+	public void invocated(IMethodBinding invokingMethodBind) {
+		ITypeBinding defineClass = invokingMethodBind.getDeclaringClass();
+		invokingClasses.add(defineClass);
 		cm++;
-	}
-
-	public MethodInvocation getMethodInvocationNode() {
-		return node;
-	}
-
-	public IMethodBinding getMethodBinding() {
-		return node.resolveMethodBinding();
 	}
 
 	// CM: times of invocated by distinct method
@@ -37,8 +31,22 @@ public class MethodInformation{
 
 	// CC: number of class which define CM method
 	public int getCC() {
+		HashMap<String,ITypeBinding> classes = new HashMap<String,ITypeBinding>();
+		for(ITypeBinding invokingclass: invokingClasses) {
+			classes.put(invokingclass.getName().toString(),invokingclass);
+		}
 		cc = classes.size();
 		return cc;
+	}
+
+	public boolean isShotgunSurgery() {
+		// CM > ShortMemoryCapacity 7
+		// CC > MANY 4
+		return getCM()>7 && getCC()>4;
+	}
+
+	public IMethodBinding getMethodBinding() {
+		return methodBind;
 	}
 
 }
