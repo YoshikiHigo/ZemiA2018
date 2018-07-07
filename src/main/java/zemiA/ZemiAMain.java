@@ -27,9 +27,6 @@ public class ZemiAMain {
 	@SuppressWarnings("unchecked")
 	public static void main(final String[] args) {
 
-		String input = "src/main/java/zemiA/ZemiAMain.java";
-		final File inputFile = new File(input);
-
 		if (classpathEntries.isEmpty()) {
 			final String systemLibraries = System.getProperty("java.class.path");
 			//final String externalLibraries = config.hasLIBRARY() ? config.getLIBRARY() : "";
@@ -39,45 +36,59 @@ public class ZemiAMain {
 		}
 
 		try {
-
-			/*String text = FileUtils.readFileToString(inputFile, Charset.defaultCharset());*/
-			// charset: encoding
-			String text = readAll(inputFile.getAbsolutePath());
-			final Document document = new Document(text);
-
-			if (input.endsWith(".java")) {
-
-				final ASTParser parser = ASTParser.newParser(AST.JLS10);
-				//parser.setSource(String.join(System.lineSeparator(), lines).toCharArray());
-				parser.setSource(document.get().toCharArray());
-				parser.setUnitName(input);
-				parser.setKind(ASTParser.K_COMPILATION_UNIT);
-				parser.setResolveBindings(true);
-				parser.setBindingsRecovery(true);
-				parser.setStatementsRecovery(true);
-
-				if (sourceDirectories.isEmpty()) {
-					sourceDirectories.add(inputFile.getParentFile().getAbsolutePath());
+			//File dir = Select.FileSelect();
+			File dir = new File("src/main/java/zemiA/");
+			String text=null;
+			String input = null;
+			File inputFile = null;
+			if(dir != null) {
+				for (File inf : dir.listFiles()) {
+					if(inf.getName().endsWith(".java")) {
+						if(text == null) {
+							input = dir.toString();
+							inputFile = inf;
+							text=readAll(inf.getAbsolutePath());
+						}
+						else text+=readAll(inf.getAbsolutePath());
+					}
 				}
+				final Document document = new Document(text);
 
-				parser.setEnvironment(classpathEntries.toArray(new String[0]),
-						sourceDirectories.toArray(new String[0]), null, true);
 
-				final Map<String, String> options = DefaultCodeFormatterConstants.getEclipseDefaultSettings();
-				options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_8);
-				options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_8);
-				options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
+				if (text!=null) {
+					final ASTParser parser = ASTParser.newParser(AST.JLS10);
+					//parser.setSource(String.join(System.lineSeparator(), lines).toCharArray());
+					parser.setSource(document.get().toCharArray());
+					parser.setUnitName(input);
+					parser.setKind(ASTParser.K_COMPILATION_UNIT);
+					parser.setResolveBindings(true);
+					parser.setBindingsRecovery(true);
+					parser.setStatementsRecovery(true);
 
-				parser.setCompilerOptions(options);
+					if (sourceDirectories.isEmpty()) {
+						sourceDirectories.add(inputFile.getParentFile().getAbsolutePath());
+					}
 
-				final CompilationUnit unit = (CompilationUnit) parser.createAST(null);
-				//final AST ast = unit.getAST();
-				//final ASTRewrite rewriter = ASTRewrite.create(ast);
-				unit.recordModifications();
+					parser.setEnvironment(classpathEntries.toArray(new String[0]),
+							sourceDirectories.toArray(new String[0]), null, true);
 
-				final ZemiAVisitor visitor = new ZemiAVisitor();
-				unit.accept(visitor);
+					final Map<String, String> options = DefaultCodeFormatterConstants.getEclipseDefaultSettings();
+					options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_8);
+					options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_8);
+					options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
 
+					parser.setCompilerOptions(options);
+
+					final CompilationUnit unit = (CompilationUnit) parser.createAST(null);
+					//final AST ast = unit.getAST();
+					//final ASTRewrite rewriter = ASTRewrite.create(ast);
+					unit.recordModifications();
+
+					final ZemiAVisitor visitor = new ZemiAVisitor();
+					//final Ch7Visitor visitor = new Ch7Visitor();
+					unit.accept(visitor);
+
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -88,6 +99,11 @@ public class ZemiAMain {
 	private static String readAll(final String path) throws IOException {
 		return Files.lines(Paths.get(path), Charset.forName("UTF-8"))
 				.collect(Collectors.joining(System.getProperty("line.separator")));
+	}
+
+
+	public static int a() {
+		return 0;
 	}
 }
 
