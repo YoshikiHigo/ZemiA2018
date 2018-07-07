@@ -53,6 +53,7 @@ public class ZemiAMain {
 					}
 				}
 				final Document document = new Document(text);
+				// text = code over project
 
 
 				if (text!=null) {
@@ -101,10 +102,6 @@ public class ZemiAMain {
 				.collect(Collectors.joining(System.getProperty("line.separator")));
 	}
 
-
-	public static int a() {
-		return 0;
-	}
 }
 
 

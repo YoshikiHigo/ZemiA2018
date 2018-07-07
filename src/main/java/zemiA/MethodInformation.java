@@ -17,7 +17,7 @@ public class MethodInformation{
 		methodBind = declaratedMethodBind;
 	}
 
-	// setter
+	// Setter
 	public void invocated(IMethodBinding invokingMethodBind) {
 		invokingMethods.add(invokingMethodBind);
 		cm++;

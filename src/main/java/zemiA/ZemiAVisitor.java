@@ -34,7 +34,7 @@ public class ZemiAVisitor extends ASTVisitor {
 
 	@Override
 	public void endVisit(CompilationUnit node) {
-		// Judgement
+		// Judgement over Project by List
 		for(MethodInvocation invokedMethod: allInvokedMethods) {
 			IMethodBinding invokedMethodBind = invokedMethod.resolveMethodBinding();
 			IMethodBinding invokingMethodBind = allInvokingMethods.get(invokedMethod).resolveBinding();

@@ -95,11 +95,11 @@ public class ClassInformation {
 		System.out.println("dispersed coupling: " + isDispersedCoupling());
 
 		// for refactoring
-//		System.out.println("invocate method list");
-//		for(IMethodBinding invokedMethod: invokedMethods) {
-//			String invokedClassName = invokedMethod.getDeclaringClass().getName().toString();
-//			System.out.println(invokedClassName + "." +invokedMethod.getName().toString());
-//		}
+		System.out.println("invocate method list");
+		for(IMethodBinding invokedMethod: invokedMethods) {
+			String invokedClassName = invokedMethod.getDeclaringClass().getName().toString();
+			System.out.println(invokedClassName + "." +invokedMethod.getName().toString());
+		}
 
 		System.out.println("");
 	}
