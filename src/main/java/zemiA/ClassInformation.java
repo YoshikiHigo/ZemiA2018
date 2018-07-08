@@ -104,4 +104,13 @@ public class ClassInformation {
 		System.out.println("");
 	}
 
+	public static ClassInformation getClassInformation(ITypeBinding classBind, List<ClassInformation> classes) {
+		for(ClassInformation classInformation: classes) {
+			if(classInformation.getClassBinding().equals(classBind)) {
+				return classInformation;
+			}
+		}
+		return null;
+	}
+
 }

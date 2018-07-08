@@ -24,13 +24,12 @@ public class ZemiAVisitor extends ASTVisitor {
 	private int nesting = 0;
 	private int maxNesting = 0;
 	private List<IMethodBinding> classMethods;
+	private List<ClassInformation> allDeclaratedClasses = new ArrayList<ClassInformation>();
 	private List<MethodInformation> allDeclaratedMethods = new ArrayList<MethodInformation>();
 	private List<MethodInvocation> allInvokedMethods = new ArrayList<MethodInvocation>();
 	private HashMap<MethodInvocation,MethodDeclaration> allInvokingMethods =
 			new HashMap<MethodInvocation,MethodDeclaration>();  //method invocation is unique
 	private Stack<MethodDeclaration> methodDeclarationStack = new Stack<MethodDeclaration>();
-	private List<ClassInformation> allDeclaratedClasses = new ArrayList<ClassInformation>();
-	private List<MethodInformation> shotgunSurgeryMethods = new ArrayList<MethodInformation>();
 
 	@Override
 	public void endVisit(CompilationUnit node) {
@@ -66,7 +65,6 @@ public class ZemiAVisitor extends ASTVisitor {
 		return !invokingClassMethods.contains(methodBind);
 	}
 
-	/*always return false: Developping...*/
 	private boolean isProjectMethod(IMethodBinding methodBind) {
 		boolean includeFlag = false;
 		for(MethodInformation declaratedMethod: allDeclaratedMethods) {
@@ -157,6 +155,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	}
 
 	public List<MethodInformation> getShotgunSurgeryMethodList(){
+		List<MethodInformation> shotgunSurgeryMethods = new ArrayList<MethodInformation>();
 		for(MethodInformation methodInformation: allDeclaratedMethods) {
 			if(methodInformation.isShotgunSurgery()) {
 				shotgunSurgeryMethods.add(methodInformation);
