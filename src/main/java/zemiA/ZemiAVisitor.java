@@ -34,27 +34,31 @@ public class ZemiAVisitor extends ASTVisitor {
 	@Override
 	public void endVisit(CompilationUnit node) {
 		// Judgement over Project by List
+
 		for(MethodInvocation invokedMethod: allInvokedMethods) {
 			IMethodBinding invokedMethodBind = invokedMethod.resolveMethodBinding();
 			IMethodBinding invokingMethodBind = allInvokingMethods.get(invokedMethod).resolveBinding();
-			ClassInformation invokingClass = getClassInformation(invokingMethodBind.getDeclaringClass());
+//			ClassInformation invokingClass;
+//			invokingClass= ClassInformation.getClassInformation(invokingMethodBind.getDeclaringClass(), allDeclaratedClasses);
+			ClassInformation invokingClass = getClassInformation(invokingMethodBind.getDeclaringClass());  //local
 			if(isDistinctMethod(invokingClass, invokedMethodBind) && isProjectMethod(invokedMethodBind)) {
 				invokingClass.invocate(invokedMethodBind);
-				getMethodInformation(invokedMethodBind).invocated(invokingMethodBind);
+//				MethodInformation.getMethodInformation(invokedMethodBind,allDeclaratedMethods).invocated(invokingMethodBind);
+				getMethodInformation(invokedMethodBind).invocated(invokingMethodBind);  //local
 			}
 		}
 
 		// Print Class Informations
 		System.out.println("print class informations: ");
 		for(ClassInformation classInformation: allDeclaratedClasses) {
-			classInformation.printClassInformation();
+			classInformation.printClassInformation(ClassInformation.FOR_DISPLAY);
 		}
 
 		// Print Project Information
 		System.out.println("shotgun surgery method list: ");
 		for(MethodInformation m: getShotgunSurgeryMethodList()) {
-			System.out.println(m.getMethodBinding().getName().toString()); //why this line comment out cause bag?
-			m.printMethodInfomation();
+			System.out.println(m.getMethodBinding().getName().toString()); //TODO why this line comment out cause bag?
+			m.printMethodInfomation(MethodInformation.FOR_DISPLAY);
 		}
 		super.endVisit(node);
 	}

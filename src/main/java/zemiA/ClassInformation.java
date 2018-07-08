@@ -8,15 +8,20 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
 public class ClassInformation {
-	ITypeBinding classBind;
+	private String className;
+	private ITypeBinding classBind;
 	private List<IMethodBinding> invokedMethods = new ArrayList<IMethodBinding>();
 	private List<IMethodBinding> classMethods;
 	private int cint = 0;	//the number of distinct method invocation
 	private double cdisp = 0;	//the number of class which define called method devided by CINT
 	private int maxNesting = 0;
 
+	public static final int FOR_DISPLAY = 0;
+	public static final int FOR_REFACTORING = 1;
+
 	public ClassInformation(ITypeBinding typeBinding) {
 		classBind = typeBinding;
+		className = classBind.getName().toString();
 	}
 
 	// setter
@@ -86,19 +91,23 @@ public class ClassInformation {
 		return dispersedCoupling && deepNesting;
 	}
 
-	public void printClassInformation() {
-		System.out.println("Class name: "+ classBind.getName().toString());
-		System.out.println("CINT: " + getCINT());
-		System.out.println("CDISP: " + getCDISP());
-		System.out.println("MAXNESTING: " + getMaxNesting());
-		System.out.println("intensive coupling: " + isIntensiveCoupling());
-		System.out.println("dispersed coupling: " + isDispersedCoupling());
+	public void printClassInformation(int mode) {
+		if(mode == FOR_DISPLAY || mode == FOR_REFACTORING) {
+			System.out.println("Class name: "+ className);
+			System.out.println("CINT: " + getCINT());
+			System.out.println("CDISP: " + getCDISP());
+			System.out.println("MAXNESTING: " + getMaxNesting());
+			System.out.println("intensive coupling: " + isIntensiveCoupling());
+			System.out.println("dispersed coupling: " + isDispersedCoupling());
+		}
 
-		// for refactoring
-		System.out.println("invocate method list");
-		for(IMethodBinding invokedMethod: invokedMethods) {
-			String invokedClassName = invokedMethod.getDeclaringClass().getName().toString();
-			System.out.println(invokedClassName + "." +invokedMethod.getName().toString());
+		if(mode == FOR_REFACTORING) {
+			// for refactoring
+			System.out.println("----- " + className + "'s invocate method list -----");
+			for(IMethodBinding invokedMethod: invokedMethods) {
+				String invokedClassName = invokedMethod.getDeclaringClass().getName().toString();
+				System.out.println(invokedClassName + "." +invokedMethod.getName().toString());
+			}
 		}
 
 		System.out.println("");
