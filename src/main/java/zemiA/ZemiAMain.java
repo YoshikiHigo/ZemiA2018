@@ -35,13 +35,15 @@ public class ZemiAMain {
 		}
 
 		try {
-			//File file = Select.FileSelect();
-			File dir = new File("src/main/java/zemiA/");
+			File dir = Select.FileSelect();
+			List<File> files = Select.extractFiles(dir);
+			//File dir = new File("src/main/java/zemiA/");
 			String text=null;
 			String input = null;
 			File inputFile = null;
 			if(dir != null) {
-				for (File inf : dir.listFiles()) {
+				for (File inf : files) {
+				//for (File inf : dir.listFiles()) {
 					if(inf.getName().endsWith(".java")) {
 						if(text == null) {
 							input = dir.toString();

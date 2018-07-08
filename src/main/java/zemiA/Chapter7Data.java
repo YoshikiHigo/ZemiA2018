@@ -153,7 +153,8 @@ public class Chapter7Data {
 	}
 	
 	public boolean isParent(String p) {
-		return pname.matches(p);
+		if(pname != null) return pname.matches(p);
+		else return false;
 	}
 	
 	public void addChild(Chapter7Data child) {
@@ -171,6 +172,10 @@ public class Chapter7Data {
 		System.out.println("NAS:"+NAS);
 		System.out.println("PNAS:"+PNAS);
 		System.out.println("BUR:"+BUR);
+		System.out.println("Refused Parent Bequest:"+this.isRPB());
+		System.out.println("Tradition Breaker:"+this.isTB());
+		System.out.println();
+		
 	}
 	
 }
