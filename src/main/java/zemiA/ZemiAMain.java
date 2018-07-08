@@ -20,7 +20,6 @@ import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 import org.eclipse.jface.text.Document;
 
 public class ZemiAMain {
-
 	private static List<String> sourceDirectories = new ArrayList<>();
 	private static List<String> classpathEntries = new ArrayList<>();
 
@@ -36,21 +35,18 @@ public class ZemiAMain {
 		}
 
 		try {
-			File file = Select.FileSelect();
-			//File file = new File("src/main/java/zemiA/");
-			int i = 0;
+			//File file = Select.FileSelect();
+			File dir = new File("src/main/java/zemiA/");
 			String text=null;
 			String input = null;
 			File inputFile = null;
-			if(file != null) {
-				File[] files = file.listFiles();
-				for (File inf : files) {
+			if(dir != null) {
+				for (File inf : dir.listFiles()) {
 					if(inf.getName().endsWith(".java")) {
-						if(i == 0) {
-							input = file.toString();
+						if(text == null) {
+							input = dir.toString();
 							inputFile = inf;
 							text=readAll(inf.getAbsolutePath());
-							i++;
 						}
 						else text+=readAll(inf.getAbsolutePath());
 					}
@@ -88,7 +84,7 @@ public class ZemiAMain {
 					unit.recordModifications();
 	
 					//final ZemiAVisitor visitor = new ZemiAVisitor();
-					final ch7Visitor visitor = new ch7Visitor();
+					final Chapter7Visitor visitor = new Chapter7Visitor();
 					unit.accept(visitor);
 					
 				}
@@ -105,10 +101,6 @@ public class ZemiAMain {
 	private static String readAll(final String path) throws IOException {
 		return Files.lines(Paths.get(path), Charset.forName("UTF-8"))
 				.collect(Collectors.joining(System.getProperty("line.separator")));
-	}
-	
-	public int a() {
-		return 0;
 	}
 }
 
