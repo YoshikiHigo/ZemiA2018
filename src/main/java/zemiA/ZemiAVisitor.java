@@ -1,13 +1,19 @@
 package zemiA;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -16,136 +22,230 @@ import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.SuperMethodReference;
 import org.eclipse.jdt.core.dom.SwitchStatement;
-import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.WhileStatement;
 
 public class ZemiAVisitor extends ASTVisitor {
-	int NOM = 0;
-	int CYCLO = 0;//WMC, complexity
-	int AMW;//WMC/NOM
-	int NOO;//Number of Override
-	int BOvR;//NOO/NOM
-	int NOI;//Number of inheritance-specific members used
-	int NOU;//Number of inheritance-specific members
-	int NAS;//Number of public methods that are not overridden from the base class(NOP-pmlist)
-	int NOP;//Number of public methods
-	int PNAS;//NAS/Parent's NOP
-	List<String> pmlist = new ArrayList<String>();//public methods
-	List<String> pmusedlist = new ArrayList<String>();//public methods overridden
-	List<String> islist = new ArrayList<String>();//inheritance-specific members
-	List<String> isusedlist = new ArrayList<String>();//inheritance-specific members used
-	String name;
-	String pname = null;
-	int i= 0;
-	List<MethodDeclaration> md = new ArrayList<MethodDeclaration>();
+	/*
+	 *  This class search java class's tree over the project
+	 *  endVisit(TypeDeclaration): finish searching previous class's tree and prepare to serch next class's tree
+	 *  endVidit(CompilationUnit): finish searching java project
+	 */
+
+	private int nesting = 0;
+	private int maxNesting = 0;
+	private List<IMethodBinding> classMethods;
+	private List<ClassInformation> allDeclaratedClasses = new ArrayList<ClassInformation>();
+	private List<MethodInformation> allDeclaratedMethods = new ArrayList<MethodInformation>();
+	private List<MethodInvocation> allInvokedMethods = new ArrayList<MethodInvocation>();
+	private HashMap<MethodInvocation,MethodDeclaration> allInvokingMethods =
+			new HashMap<MethodInvocation,MethodDeclaration>();  //method invocation is unique
+	private Stack<MethodDeclaration> methodDeclarationStack = new Stack<MethodDeclaration>();
+	
+
+	private List<IVariableBinding> usedSuperFields;
+	private List<IMethodBinding> usedSuperMethods;
+	private int NOM = 0;
+	private int WMC = 0;//=WMC, complexity
+	private int NProtM = 0;
+	//private List<MethodDeclaration> mlist;//method list
+	private List<MethodDeclaration> pmlist;//public method list
+	private List<MethodDeclaration> ismlist;//public or protected method list
+	private List<FieldDeclaration> alist;//fieldlist
+	private List<FieldDeclaration> isalist;//public or protected field list
 	
 	
+	
+	
+	
+
 	@Override
-	public boolean visit(CompilationUnit node) {
-		// TODO Auto-generated method stub
-		//node.get
+	public void endVisit(CompilationUnit node) {
+		// Judgement over Project by List
+
+		for(MethodInvocation invokedMethod: allInvokedMethods) {
+			IMethodBinding invokedMethodBind = invokedMethod.resolveMethodBinding();
+			IMethodBinding invokingMethodBind = allInvokingMethods.get(invokedMethod).resolveBinding();
+//			ClassInformation invokingClass;
+//			invokingClass= ClassInformation.getClassInformation(invokingMethodBind.getDeclaringClass(), allDeclaratedClasses);
+			ClassInformation invokingClass = getClassInformation(invokingMethodBind.getDeclaringClass());  //local
+			if(isDistinctMethod(invokingClass, invokedMethodBind) && isProjectMethod(invokedMethodBind)) {
+				invokingClass.invocate(invokedMethodBind);
+//				MethodInformation.getMethodInformation(invokedMethodBind,allDeclaratedMethods).invocated(invokingMethodBind);
+				getMethodInformation(invokedMethodBind).invocated(invokingMethodBind);  //local
+			}
+		}
 		
-		return super.visit(node);
+		
+		
+
+		for(ClassInformation Data : allDeclaratedClasses) {	
+			ClassInformation pData = getClassInformation(Data.getParentBindig());
+			if(pData != null) {
+				Data.setParentClass(pData);
+				pData.addChildClass(Data);
+				double ovnum = 0;
+				int povnum = 0;
+	
+				for(IMethodBinding m :Data.getMethodsList()) {
+					for(MethodDeclaration pm :pData.getIsmlist()) {
+						if(m.overrides(pm.resolveBinding()))ovnum++;
+					}
+				}
+				for(MethodDeclaration m :Data.getPmlist()) {
+					for(MethodDeclaration pm :pData.getIsmlist()) {
+						if(m.resolveBinding().overrides(pm.resolveBinding())) povnum++;
+					}
+				}
+				Data.setInheritanceInformation(ovnum, povnum);
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+
+		// Print Class Informations
+		System.out.println("print class informations: ");
+		for(ClassInformation classInformation: allDeclaratedClasses) {
+			classInformation.printClassInformation(ClassInformation.FOR_DISPLAY);
+
+		}
+
+		// Print Project Information
+		System.out.println("shotgun surgery method list: ");
+		for(MethodInformation m: getShotgunSurgeryMethodList()) {
+			System.out.println(m.getMethodBinding().getName().toString()); //TODO why this line comment out cause bag?
+			m.printMethodInfomation(MethodInformation.FOR_DISPLAY);
+		}
+		
+		super.endVisit(node);
 	}
 
+	private boolean isDistinctMethod(ClassInformation invokingClass, IMethodBinding methodBind) {
+		// if distinct method contains() returns false
+		 List<IMethodBinding> invokingClassMethods = invokingClass.getMethodsList();
+		return !invokingClassMethods.contains(methodBind);
+	}
 
+	private boolean isProjectMethod(IMethodBinding methodBind) {
+		boolean includeFlag = false;
+		for(MethodInformation declaratedMethod: allDeclaratedMethods) {
+			includeFlag = declaratedMethod.getMethodBinding().equals(methodBind);
+			if(includeFlag == true) {
+				break;
+			}
+		}
+		return includeFlag;
+	}
 
+	private MethodInformation getMethodInformation(IMethodBinding methodBind) {
+		for(MethodInformation methodInformation: allDeclaratedMethods) {
+			if(methodInformation.getMethodBinding().equals(methodBind)) {
+				return methodInformation;
+			}
+		}
+		// if the method is not project method
+		return null;
+	}
+
+	private ClassInformation getClassInformation(ITypeBinding classBind) {
+		if(classBind != null) {
+			for(ClassInformation classInformation: allDeclaratedClasses) {
+				if(classInformation.getClassBinding().equals(classBind)) {
+					return classInformation;
+				}
+			}
+		}
+		return null;
+	}
 
 	@Override
 	public boolean visit(TypeDeclaration node) {
+		// prepare to search next class :Initialize
+		maxNesting = 0;
+		classMethods = new ArrayList<IMethodBinding>();
+		//allDeclaratedClasses.add(new ClassInformation(node.resolveBinding()));
 		
-		MethodDeclaration[] m = node.getMethods();
-		md.addAll(Arrays.asList(m));
-		//System.arraycopy(m, 0, md, 0, m.length);
-		//System.arraycopy(m, 0, md, md.length, m.length);
-		//System.out.println(node.getParent());
+		NOM = 0;
+		WMC = 0;//=WMC, complexity
+		NProtM = 0;
+		pmlist = new ArrayList<MethodDeclaration>();//public method list
+		ismlist = new ArrayList<MethodDeclaration>();//public or protected method list
+		alist = new ArrayList<FieldDeclaration>();//fieldlist
+		isalist = new ArrayList<FieldDeclaration>();//public or protected field list
+		usedSuperFields = new ArrayList<IVariableBinding>();
+		usedSuperMethods = new ArrayList<IMethodBinding>();	
 		
-		Type snode;
-		// TODO Auto-generated method stub
-		name = node.getName().toString();
-		System.out.println(name+":");
-		snode = node.getSuperclassType();
-		if(snode != null) {
-			pname = snode.toString();
-			//System.out.println(pname);
+		for(MethodDeclaration mb: node.getMethods()) {
+			classMethods.add(mb.resolveBinding());
+			allDeclaratedMethods.add(new MethodInformation(mb.resolveBinding()));
 		}
-		return super.visit(node);
-	}
-
-	
-	
-	
-	@Override
-	public boolean visit(MethodInvocation node) {
-		// TODO Auto-generated method stub
-		//ZemiAMain.a();
-		for(MethodDeclaration m :md) {
-			boolean a = m.resolveBinding().equals((node.resolveMethodBinding()));
-			if(a)System.out.println(m.getName().toString() + a);
-		}
-		
-		if(null == node.resolveMethodBinding().getDeclaringClass())System.out.println("11111111111111111111111111111111");
-		
-		return super.visit(node);
-	}
-
-
-
-
-	@Override
-	public boolean visit(MethodDeclaration node) {
-		
-		//System.out.println(node);
-		// TODO Auto-generated method stub
-		//System.out.println(node.getReceiverType());
-		//System.out.println(node.getReceiverQualifier());
-		//System.out.println(node.getJavadoc());
-		//System.out.println(node.getExtraDimensions());
-		//System.out.println(node.typeParameters());
-		//System.out.println(node.parameters());
-		//System.out.println(node.modifiers());
-		//System.out.println(node.getReturnType2());
-		
-		
-		
-		NOM++;
-		if((Modifier.PUBLIC & node.getModifiers()) != 0) {
-			NOP++;
-			pmlist.add(node.getName().toString());
-			islist.add(node.getName().toString());
-		}else if((Modifier.PROTECTED & node.getModifiers()) != 0){
-			islist.add(node.getName().toString());
-		}
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(SuperFieldAccess node) {
-		// TODO Auto-generated method stub
-		isusedlist.add(node.toString());
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(SuperMethodInvocation node) {//yobidasi
-		// TODO Auto-generated method stub
-		isusedlist.add(node.toString());
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(SuperMethodReference node) {//
-		// TODO Auto-generated method stub
-		isusedlist.add(node.toString());
 		return super.visit(node);
 	}
 
 	@Override
 	public void endVisit(TypeDeclaration node) {
-		// TODO Auto-generated method stub
-		//System.out.println(primlist.toString());
-		//System.out.println(islist.toString());
-		//System.out.println(isusedlist.toString());
+		// set searched class information
+		ClassInformation checkedClass = new ClassInformation(node.resolveBinding());
+		allDeclaratedClasses.add(checkedClass);
+		
+		checkedClass.setClassInformation(classMethods ,maxNesting , NOM, WMC, NProtM,
+				 pmlist, ismlist, alist, isalist, usedSuperFields, usedSuperMethods);
+		
+		ITypeBinding stb = node.resolveBinding().getSuperclass();
+		if(stb != null) {
+			checkedClass.setParent(stb);
+		}
+		
+		super.endVisit(node);
+	}
+
+	@Override
+	public boolean visit(MethodDeclaration node) {
+		// to access from MethodInvocation to MethodDeclaration
+		methodDeclarationStack.push(node);
+		
+		NOM++;
+		if((Modifier.PUBLIC & node.getModifiers()) != 0) {
+			pmlist.add(node);
+			ismlist.add(node);
+		}else if((Modifier.PROTECTED & node.getModifiers()) != 0){
+			NProtM++;
+			ismlist.add(node);
+		}
+		return super.visit(node);
+	}
+
+	@Override
+	public void endVisit(MethodDeclaration node) {
+		// to access from MethodInvocation to MethodDeclaration
+		methodDeclarationStack.pop();
+		super.endVisit(node);
+	}
+
+	@Override
+	public boolean visit(MethodInvocation node) {
+		allInvokedMethods.add(node);
+		allInvokingMethods.put(node, methodDeclarationStack.peek());
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(Block node) {
+		nesting++;
+		if(maxNesting < nesting) {
+			maxNesting = nesting;
+		}
+		return super.visit(node);
+	}
+
+	@Override
+	public void endVisit(Block node) {
+		nesting--;
 		super.endVisit(node);
 	}
 
@@ -153,9 +253,10 @@ public class ZemiAVisitor extends ASTVisitor {
 	public boolean visit(FieldDeclaration node) {
 		// TODO Auto-generated method stub
 		if((Modifier.PUBLIC & node.getModifiers()) != 0) {
-			islist.add(node.fragments().toString());
+			isalist.add(node);
 		}else if((Modifier.PROTECTED & node.getModifiers()) != 0){
-			islist.add(node.getType().toString());
+			isalist.add(node);
+			NProtM++;
 		}
 		return super.visit(node);
 	}
@@ -163,26 +264,64 @@ public class ZemiAVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(ForStatement node) {
 		// TODO Auto-generated method stub
-		CYCLO++;
+		WMC++;
 		return super.visit(node);
 	}
-
 	@Override
 	public boolean visit(IfStatement node) {
 		// TODO Auto-generated method stub
-		CYCLO++;
+		WMC++;
 		return super.visit(node);
 	}
-
 	@Override
 	public boolean visit(SwitchStatement node) {
 		// TODO Auto-generated method stub
-		CYCLO++;	
+		WMC++;
 		return super.visit(node);
 	}
-
-
-
+	@Override
+	public boolean visit(WhileStatement node) {
+		// TODO Auto-generated method stub
+		WMC++;
+		return super.visit(node);
+	}
+	@Override
+	public boolean visit(DoStatement node) {
+		// TODO Auto-generated method stub
+		WMC++;
+		return super.visit(node);
+	}
+	@Override
+	public boolean visit(SuperFieldAccess node) {
+		// TODO Auto-generated method stub
+		if(usedSuperFields.contains(node.resolveFieldBinding()));
+		else usedSuperFields.add(node.resolveFieldBinding());
+		return super.visit(node);
+	}
+	@Override
+	public boolean visit(SuperMethodInvocation node) {
+		// TODO Auto-generated method stub
+		if(usedSuperMethods.contains(node.resolveMethodBinding()));
+		else usedSuperMethods.add(node.resolveMethodBinding());
+		return super.visit(node);
+	}
+	@Override
+	public boolean visit(SuperMethodReference node) {
+		// TODO Auto-generated method stub
+		if(usedSuperMethods.contains(node.resolveMethodBinding()));
+		else usedSuperMethods.add(node.resolveMethodBinding());
+		return super.visit(node);
+	}
 	
-	
+
+	public List<MethodInformation> getShotgunSurgeryMethodList(){
+		List<MethodInformation> shotgunSurgeryMethods = new ArrayList<MethodInformation>();
+		for(MethodInformation methodInformation: allDeclaratedMethods) {
+			if(methodInformation.isShotgunSurgery()) {
+				shotgunSurgeryMethods.add(methodInformation);
+			}
+		}
+		return shotgunSurgeryMethods;
+	}
+
 }

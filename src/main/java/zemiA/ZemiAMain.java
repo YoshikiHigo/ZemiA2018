@@ -35,15 +35,15 @@ public class ZemiAMain {
 		}
 
 		try {
-			File dir = Select.FileSelect();
-			List<File> files = Select.extractFiles(dir);
-			//File dir = new File("src/main/java/zemiA/");
+			//File dir = Select.FileSelect();
+			//List<File> files = Select.extractFiles(dir, 0);
+			File dir = new File("src/main/java/zemiA/");
 			String text=null;
 			String input = null;
 			File inputFile = null;
 			if(dir != null) {
-				for (File inf : files) {
-				//for (File inf : dir.listFiles()) {
+				//for (File inf : files) {
+				for (File inf : dir.listFiles()) {
 					if(inf.getName().endsWith(".java")) {
 						if(text == null) {
 							input = dir.toString();
@@ -86,7 +86,7 @@ public class ZemiAMain {
 					unit.recordModifications();
 	
 					//final ZemiAVisitor visitor = new ZemiAVisitor();
-					final Chapter7Visitor visitor = new Chapter7Visitor();
+					final ZemiAVisitor visitor = new ZemiAVisitor();
 					unit.accept(visitor);
 					
 				}

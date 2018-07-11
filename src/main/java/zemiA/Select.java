@@ -16,18 +16,19 @@ import java.util.List;
 			return file;
 		}
 		
-		static List<File> extractFiles(File file) {
+		static List<File> extractFiles(File file, int depth) {
 			List<File> files = new ArrayList<File>();
-			if(file.isDirectory()) {
+			if(depth < 3) {
+				if(file.isDirectory()) {
+					
+					for (File inf : file.listFiles()) {
+						 if (inf.isFile()) files.add(inf);
+						 else if (inf.isDirectory()) files.addAll(extractFiles(inf, depth++));
+					}
 				
-			for (File inf : file.listFiles()) {
-				 if (inf.isFile()) files.add(inf);
-				 else if (inf.isDirectory()) {
-		                for (File cinf : inf.listFiles()) files.addAll(extractFiles(cinf));
-		            }
-			}
+				}else if(file.getName().endsWith(".java")) files.add(file);
 			
-			}else files.add(file);
+			}
 			return files;
 			
 		}
