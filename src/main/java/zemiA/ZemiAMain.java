@@ -20,7 +20,6 @@ import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 import org.eclipse.jface.text.Document;
 
 public class ZemiAMain {
-
 	private static List<String> sourceDirectories = new ArrayList<>();
 	private static List<String> classpathEntries = new ArrayList<>();
 
@@ -37,11 +36,13 @@ public class ZemiAMain {
 
 		try {
 			//File dir = Select.FileSelect();
+			//List<File> files = Select.extractFiles(dir, 0);
 			File dir = new File("src/main/java/zemiA/");
-			String text = null;
+			String text=null;
 			String input = null;
 			File inputFile = null;
 			if(dir != null) {
+				//for (File inf : files) {
 				for (File inf : dir.listFiles()) {
 					if(inf.getName().endsWith(".java")) {
 						if(text == null) {
@@ -53,9 +54,8 @@ public class ZemiAMain {
 					}
 				}
 				final Document document = new Document(text);
-				// text = code over project
-
-
+				
+				
 				if (text!=null) {
 					final ASTParser parser = ASTParser.newParser(AST.JLS10);
 					//parser.setSource(String.join(System.lineSeparator(), lines).toCharArray());
@@ -65,35 +65,38 @@ public class ZemiAMain {
 					parser.setResolveBindings(true);
 					parser.setBindingsRecovery(true);
 					parser.setStatementsRecovery(true);
-
+	
 					if (sourceDirectories.isEmpty()) {
 						sourceDirectories.add(inputFile.getParentFile().getAbsolutePath());
 					}
-
+	
 					parser.setEnvironment(classpathEntries.toArray(new String[0]),
 							sourceDirectories.toArray(new String[0]), null, true);
-
+	
 					final Map<String, String> options = DefaultCodeFormatterConstants.getEclipseDefaultSettings();
 					options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_8);
 					options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_8);
 					options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
-
+	
 					parser.setCompilerOptions(options);
-
+	
 					final CompilationUnit unit = (CompilationUnit) parser.createAST(null);
 					//final AST ast = unit.getAST();
 					//final ASTRewrite rewriter = ASTRewrite.create(ast);
 					unit.recordModifications();
-
+	
+					//final ZemiAVisitor visitor = new ZemiAVisitor();
 					final ZemiAVisitor visitor = new ZemiAVisitor();
-					//final Ch7Visitor visitor = new Ch7Visitor();
 					unit.accept(visitor);
-
+					
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		
+		
 	}
 
 
@@ -101,9 +104,4 @@ public class ZemiAMain {
 		return Files.lines(Paths.get(path), Charset.forName("UTF-8"))
 				.collect(Collectors.joining(System.getProperty("line.separator")));
 	}
-
 }
-
-
-
-
