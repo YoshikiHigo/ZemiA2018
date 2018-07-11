@@ -11,6 +11,7 @@ public class MethodInformation{
 	private IMethodBinding methodBind;
 	private int cm = 0;
 	private int cc = 0;
+	private int methodLOC = 0;
 	private List<ITypeBinding> invokingClasses = new ArrayList<ITypeBinding>();
 
 	public MethodInformation(IMethodBinding declaratedMethodBind) {
@@ -22,6 +23,10 @@ public class MethodInformation{
 		ITypeBinding defineClass = invokingMethodBind.getDeclaringClass();
 		invokingClasses.add(defineClass);
 		cm++;
+	}
+	
+	public void setMethodLOC(int loc) {
+		methodLOC = loc;
 	}
 
 	// CM: times of invocated by distinct method

@@ -20,31 +20,35 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 public class ZemiAVisitor extends ASTVisitor {
 	/*
-	 *  This class search java class's tree over the project
-	 *  endVisit(TypeDeclaration): finish searching previous class's tree and prepare to serch next class's tree
-	 *  endVidit(CompilationUnit): finish searching java project
+	 * This class search java class's tree over the project
+	 * endVisit(TypeDeclaration): finish searching previous class's tree and prepare
+	 * to serch next class's tree endVidit(CompilationUnit): finish searching java
+	 * project
 	 */
-	/*===========*/
+	/* =========== */
 	private int privatefields;
 
 	CompilationUnit unit;
 	private String methodname;
-	private Map<String,Boolean> fieldmap= new HashMap<String,Boolean>();
+	private Map<String, Boolean> fieldmap = new HashMap<String, Boolean>();
 	private ArrayList<String> methodlist = new ArrayList<String>();
-	private Map<String,Boolean> accessormethodmap= new HashMap<String,Boolean>();
-	private Map<String,Integer> methodLOCmap= new HashMap<String,Integer>();
+	private Map<String, Boolean> accessormethodmap = new HashMap<String, Boolean>();
+	private Map<String, Integer> methodLOCmap = new HashMap<String, Integer>();
 	private int publicFunctionalMethod;
 	private int publicMethod;
 	private int woc;
-	/*=================*/
+	private int classLOC;
+	/* ================= */
 
 	private int nesting = 0;
 	private int maxNesting = 0;
 	private List<IMethodBinding> classMethods;
 	private List<MethodInformation> allDeclaratedMethods = new ArrayList<MethodInformation>();
 	private List<MethodInvocation> allInvokedMethods = new ArrayList<MethodInvocation>();
-	private HashMap<MethodInvocation,MethodDeclaration> allInvokingMethods =
-			new HashMap<MethodInvocation,MethodDeclaration>();  //method invocation is unique
+	private HashMap<MethodInvocation, MethodDeclaration> allInvokingMethods = new HashMap<MethodInvocation, MethodDeclaration>(); // method
+																																	// invocation
+																																	// is
+																																	// unique
 	private Stack<MethodDeclaration> methodDeclarationStack = new Stack<MethodDeclaration>();
 	private List<ClassInformation> allDeclaratedClasses = new ArrayList<ClassInformation>();
 	private List<MethodInformation> shotgunSurgeryMethods = new ArrayList<MethodInformation>();
@@ -52,19 +56,19 @@ public class ZemiAVisitor extends ASTVisitor {
 	@Override
 	public void endVisit(CompilationUnit node) {
 		// Judgement
-		for(MethodInvocation invokedMethod: allInvokedMethods) {
+		for (MethodInvocation invokedMethod : allInvokedMethods) {
 			IMethodBinding invokedMethodBind = invokedMethod.resolveMethodBinding();
 			IMethodBinding invokingMethodBind = allInvokingMethods.get(invokedMethod).resolveBinding();
 			ClassInformation invokingClass = getClassInformation(invokingMethodBind.getDeclaringClass());
 
-			if(isDistinctMethod(invokingClass, invokedMethodBind) && isProjectMethod(invokedMethodBind)) {
+			if (isDistinctMethod(invokingClass, invokedMethodBind) && isProjectMethod(invokedMethodBind)) {
 				invokingClass.invocate(invokedMethodBind);
 				getMethodInformation(invokedMethodBind).invocated(invokingMethodBind);
 			}
 
-			/*==================*/
-			for(String method : methodlist) {
-				System.out.println(method+"="+accessormethodmap.get(method));
+			/* ================== */
+			/*for (String method : methodlist) {
+				System.out.println(method + "=" + accessormethodmap.get(method));
 			}
 			for (String method : methodlist) {
 				System.out.println(method + "=" + accessormethodmap.get(method));
@@ -77,24 +81,24 @@ public class ZemiAVisitor extends ASTVisitor {
 				this.woc = this.publicFunctionalMethod / this.publicMethod;
 			}
 			System.out.print("WOC = ");
-			System.out.println(this.woc);
-			/*==================*/
+			System.out.println(this.woc);*/
+			/* ================== */
 		}
 
 		// Print Class Informations
-		for(ClassInformation classInformation: allDeclaratedClasses) {
+		for (ClassInformation classInformation : allDeclaratedClasses) {
 			classInformation.printClassInformation();
 		}
 
 		// Print Project Information
 		System.out.println("Project: ");
 		System.out.println("shotgun surgery method: ");
-		for(MethodInformation m: getShotgunSurgeryMethodList()) {
+		for (MethodInformation m : getShotgunSurgeryMethodList()) {
 			System.out.println(m.getMethodBinding().getName().toString());
 		}
-		for(String method : methodlist) {
-			System.out.println(method+"LOC="+methodLOCmap.get(method));
-		}
+		/*for (String method : methodlist) {
+			System.out.println(method + "LOC=" + methodLOCmap.get(method));
+		}*/
 		super.endVisit(node);
 	}
 
@@ -104,12 +108,12 @@ public class ZemiAVisitor extends ASTVisitor {
 		return !invokingClassMethods.contains(methodBind);
 	}
 
-	/*always return false: Developping...*/
+	/* always return false: Developping... */
 	private boolean isProjectMethod(IMethodBinding methodBind) {
 		boolean includeFlag = false;
-		for(MethodInformation declaratedMethod: allDeclaratedMethods) {
+		for (MethodInformation declaratedMethod : allDeclaratedMethods) {
 			includeFlag = declaratedMethod.getMethodBinding().equals(methodBind);
-			if(includeFlag == true) {
+			if (includeFlag == true) {
 				break;
 			}
 		}
@@ -117,8 +121,8 @@ public class ZemiAVisitor extends ASTVisitor {
 	}
 
 	private MethodInformation getMethodInformation(IMethodBinding methodBind) {
-		for(MethodInformation methodInformation: allDeclaratedMethods) {
-			if(methodInformation.getMethodBinding().equals(methodBind)) {
+		for (MethodInformation methodInformation : allDeclaratedMethods) {
+			if (methodInformation.getMethodBinding().equals(methodBind)) {
 				return methodInformation;
 			}
 		}
@@ -127,8 +131,8 @@ public class ZemiAVisitor extends ASTVisitor {
 	}
 
 	private ClassInformation getClassInformation(ITypeBinding classBind) {
-		for(ClassInformation classInformation: allDeclaratedClasses) {
-			if(classInformation.getClassBinding().equals(classBind)) {
+		for (ClassInformation classInformation : allDeclaratedClasses) {
+			if (classInformation.getClassBinding().equals(classBind)) {
 				return classInformation;
 			}
 		}
@@ -139,13 +143,17 @@ public class ZemiAVisitor extends ASTVisitor {
 	public boolean visit(TypeDeclaration node) {
 		// prepare to search next class :Initialize
 		maxNesting = 0;
+		publicFunctionalMethod = 0;
+		publicMethod = 0;
 		classMethods = new ArrayList<IMethodBinding>();
 		allDeclaratedClasses.add(new ClassInformation(node.resolveBinding()));
 
-		for(MethodDeclaration mb: node.getMethods()) {
+		for (MethodDeclaration mb : node.getMethods()) {
 			classMethods.add(mb.resolveBinding());
 			allDeclaratedMethods.add(new MethodInformation(mb.resolveBinding()));
 		}
+		classLOC = unit.getLineNumber(node.getStartPosition() + node.getLength() - 1) + 1
+				- unit.getLineNumber(node.getStartPosition());
 		return super.visit(node);
 	}
 
@@ -155,6 +163,11 @@ public class ZemiAVisitor extends ASTVisitor {
 		ClassInformation searchedClass = getClassInformation(node.resolveBinding());
 		searchedClass.setMethodList(classMethods);
 		searchedClass.setMaxNesting(maxNesting);
+		if (this.publicMethod != 0) {
+			woc = this.publicFunctionalMethod / this.publicMethod;
+		}
+		searchedClass.setClassWOC(woc);
+		searchedClass.setClassLOC(classLOC);
 		super.endVisit(node);
 	}
 
@@ -162,18 +175,22 @@ public class ZemiAVisitor extends ASTVisitor {
 	public boolean visit(MethodDeclaration node) {
 		// to access from MethodInvocation to MethodDeclaration
 		methodDeclarationStack.push(node);
-		/*===============*/
+		/* =============== */
 		this.publicMethod++;
 		this.publicFunctionalMethod++;
-		System.out.print(node.getName() + " method LOC = ");
+		/*System.out.print(node.getName() + " method LOC = ");
 		System.out.println(unit.getLineNumber(node.getStartPosition() + node.getLength() - 1) + 1
+				- unit.getLineNumber(node.getStartPosition()));*/
+		MethodInformation aaa = getMethodInformation(node.resolveBinding());
+		aaa.setMethodLOC(unit.getLineNumber(node.getStartPosition() + node.getLength() - 1) + 1
 				- unit.getLineNumber(node.getStartPosition()));
 		methodname = node.getName().toString();
 		accessormethodmap.put(methodname, Boolean.FALSE);
 		methodlist.add(methodname);
-		int methodloc=unit.getLineNumber(node.getStartPosition() + node.getLength() -1)+1-unit.getLineNumber(node.getStartPosition());
+		int methodloc = unit.getLineNumber(node.getStartPosition() + node.getLength() - 1) + 1
+				- unit.getLineNumber(node.getStartPosition());
 		methodLOCmap.put(methodname, methodloc);
-		/*==============*/
+		/* ============== */
 		return super.visit(node);
 	}
 
@@ -194,7 +211,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(Block node) {
 		nesting++;
-		if(maxNesting < nesting) {
+		if (maxNesting < nesting) {
 			maxNesting = nesting;
 		}
 		return super.visit(node);
@@ -206,18 +223,16 @@ public class ZemiAVisitor extends ASTVisitor {
 		super.endVisit(node);
 	}
 
-	public List<MethodInformation> getShotgunSurgeryMethodList(){
-		for(MethodInformation methodInformation: allDeclaratedMethods) {
-			if(methodInformation.isShotgunSurgery()) {
+	public List<MethodInformation> getShotgunSurgeryMethodList() {
+		for (MethodInformation methodInformation : allDeclaratedMethods) {
+			if (methodInformation.isShotgunSurgery()) {
 				shotgunSurgeryMethods.add(methodInformation);
 			}
 		}
 		return shotgunSurgeryMethods;
 	}
 
-	/*==================*/
-
-
+	/* ================== */
 
 	@Override
 	public boolean visit(ReturnStatement node) {
@@ -238,27 +253,24 @@ public class ZemiAVisitor extends ASTVisitor {
 		return super.visit(node);
 	}
 
-
-	//NOPA Number of public attributes /Entity: Class
-	//public修飾子のついたfield変数の数
+	// NOPA Number of public attributes /Entity: Class
+	// public修飾子のついたfield変数の数
 
 	@Override
 	public boolean visit(FieldDeclaration node) {
-		System.out.print(node.toString());
+		//System.out.print(node.toString());
 		if (Modifier.isPublic(node.getModifiers())) {
 			this.privatefields += 1;
-			System.out.println("isPublic");
+			//System.out.println("isPublic");
 		}
-		System.out.println(this.privatefields);
+		//System.out.println(this.privatefields);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(CompilationUnit node) {
-		unit=node;
+		unit = node;
 		return super.visit(node);
 	}
 
 }
-
-

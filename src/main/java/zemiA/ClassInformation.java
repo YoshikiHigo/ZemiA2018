@@ -14,6 +14,8 @@ public class ClassInformation {
 	private int cint = 0;	//the number of distinct method invocation
 	private double cdisp = 0;	//the number of class which define called method devided by CINT
 	private int maxNesting = 0;
+	private int classWOC = 0;
+	private int classLOC = 0;
 
 	public ClassInformation(ITypeBinding typeBinding) {
 		classBind = typeBinding;
@@ -68,6 +70,22 @@ public class ClassInformation {
 		//maxNesting include method definition block
 		return maxNesting;
 	}
+	
+	public void setClassWOC(int woc) {
+		classWOC = woc;
+	}
+	
+	public int getClassWOC() {
+		return classWOC;
+	}
+	
+	public void setClassLOC(int loc) {
+		classLOC = loc;
+	}
+	
+	public int getClassLOC() {
+		return classLOC;
+	}
 
 	public boolean isIntensiveCoupling() {
 		// CINT: ShortMemoryCap 7, CDISP: HALF
@@ -90,6 +108,8 @@ public class ClassInformation {
 		System.out.println("CINT: " + getCINT());
 		System.out.println("CDISP: " + getCDISP());
 		System.out.println("MAXNESTING: " + getMaxNesting());
+		System.out.println("WOC: "+ getClassWOC());
+		System.out.println("LOC: "+ getClassLOC());
 		System.out.println("intensive coupling: " + isIntensiveCoupling());
 		System.out.println("dispersed coupling: " + isDispersedCoupling());
 
