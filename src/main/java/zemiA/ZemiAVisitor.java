@@ -24,8 +24,8 @@ public class ZemiAVisitor extends ASTVisitor {
 	private int nesting = 0;
 	private int maxNesting = 0;
 	private List<IMethodBinding> classMethods;
-	private List<ClassInformation> allDeclaratedClasses = new ArrayList<ClassInformation>();
-	private List<MethodInformation> allDeclaratedMethods = new ArrayList<MethodInformation>();
+	private List<ClassInformation> allDeclaratedClasses = new ArrayList<ClassInformation>();  //project's classes
+	private List<MethodInformation> allDeclaratedMethods = new ArrayList<MethodInformation>();  //project's methods
 	private List<MethodInvocation> allInvokedMethods = new ArrayList<MethodInvocation>();
 	private HashMap<MethodInvocation,MethodDeclaration> allInvokingMethods =
 			new HashMap<MethodInvocation,MethodDeclaration>();  //method invocation is unique
@@ -51,14 +51,14 @@ public class ZemiAVisitor extends ASTVisitor {
 		// Print Class Informations
 		System.out.println("print class informations: ");
 		for(ClassInformation classInformation: allDeclaratedClasses) {
-			classInformation.printClassInformation(ClassInformation.FOR_DISPLAY);
+			classInformation.printClassInformation(ClassInformation.FOR_REFACTORING);
 		}
 
 		// Print Project Information
 		System.out.println("shotgun surgery method list: ");
 		for(MethodInformation m: getShotgunSurgeryMethodList()) {
 			System.out.println(m.getMethodBinding().getName().toString()); //TODO why this line comment out cause bag?
-			m.printMethodInfomation(MethodInformation.FOR_DISPLAY);
+			m.printMethodInfomation(MethodInformation.FOR_REFACTORING);
 		}
 		super.endVisit(node);
 	}
@@ -115,12 +115,16 @@ public class ZemiAVisitor extends ASTVisitor {
 
 	@Override
 	public void endVisit(TypeDeclaration node) {
-		// set searched class information
+		// set checked class information
 		ClassInformation checkedClass = new ClassInformation(node.resolveBinding());
 		allDeclaratedClasses.add(checkedClass);
 		//ClassInformation searchedClass = getClassInformation(node.resolveBinding());
+
+		// TODO セッターの統合
 		checkedClass.setMethodList(classMethods);
 		checkedClass.setMaxNesting(maxNesting);
+
+
 		super.endVisit(node);
 	}
 

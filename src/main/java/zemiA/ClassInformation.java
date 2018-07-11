@@ -52,8 +52,9 @@ public class ClassInformation {
 		return classBind;
 	}
 
-	public void setMethodList(List<IMethodBinding> methods) {
-		classMethods = methods;
+	// TODO セッターの統合
+	public void setMethodList(List<IMethodBinding> allDeclaratingMethods) {
+		classMethods = allDeclaratingMethods;
 	}
 
 	public List<IMethodBinding> getMethodsList(){
@@ -61,10 +62,11 @@ public class ClassInformation {
 	}
 
 
+	// TODO セッターの統合
 	public boolean setMaxNesting(int nesting) {
 		if(nesting<0) {
 			return false;
-		}else {
+		}else{
 			maxNesting = nesting;
 			return true;
 		}
@@ -74,6 +76,19 @@ public class ClassInformation {
 		//maxNesting include method definition block
 		return maxNesting;
 	}
+
+	//TODO NOM,WMC,NProtM,LOCなどもまとめて入れる
+//	public void setClassInformation(List<IMethodBinding> allDeclaratingMethods, int MAXNESTING,
+//			int NOM, int WMC, int NprotM, int LOC) {
+//		classMethods = allDeclaratingMethods;
+//		maxNesting = MAXNESTING;
+//		nom = NOM;
+//		wmc = WMC;
+//		nprotm = NprotM;
+//		loc = LOC;
+//	}
+
+
 
 	public boolean isIntensiveCoupling() {
 		// CINT: ShortMemoryCap 7, CDISP: HALF
@@ -103,7 +118,7 @@ public class ClassInformation {
 
 		if(mode == FOR_REFACTORING) {
 			// for refactoring
-			System.out.println("----- " + className + "'s invocate method list -----");
+			System.out.println("----- " + className + "'s invocating method list -----");
 			for(IMethodBinding invokedMethod: invokedMethods) {
 				String invokedClassName = invokedMethod.getDeclaringClass().getName().toString();
 				System.out.println(invokedClassName + "." +invokedMethod.getName().toString());
