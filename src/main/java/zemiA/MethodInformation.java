@@ -14,6 +14,8 @@ public class MethodInformation{
 	private int methodLOC = 0;
 	private List<ITypeBinding> invokingClasses = new ArrayList<ITypeBinding>();
 
+	private boolean accessor = false;
+
 	public MethodInformation(IMethodBinding declaratedMethodBind) {
 		methodBind = declaratedMethodBind;
 	}
@@ -24,9 +26,13 @@ public class MethodInformation{
 		invokingClasses.add(defineClass);
 		cm++;
 	}
-	
+
 	public void setMethodLOC(int loc) {
 		methodLOC = loc;
+	}
+
+	public void setAccessor(boolean b) {
+		accessor = b;
 	}
 
 	// CM: times of invocated by distinct method

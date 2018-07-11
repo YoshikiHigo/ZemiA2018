@@ -17,6 +17,8 @@ public class ClassInformation {
 	private int classWOC = 0;
 	private int classLOC = 0;
 
+	private int noam=0;//the Number of Acceccor Methods
+
 	public ClassInformation(ITypeBinding typeBinding) {
 		classBind = typeBinding;
 	}
@@ -70,19 +72,19 @@ public class ClassInformation {
 		//maxNesting include method definition block
 		return maxNesting;
 	}
-	
+
 	public void setClassWOC(int woc) {
 		classWOC = woc;
 	}
-	
+
 	public int getClassWOC() {
 		return classWOC;
 	}
-	
+
 	public void setClassLOC(int loc) {
 		classLOC = loc;
 	}
-	
+
 	public int getClassLOC() {
 		return classLOC;
 	}
@@ -110,6 +112,7 @@ public class ClassInformation {
 		System.out.println("MAXNESTING: " + getMaxNesting());
 		System.out.println("WOC: "+ getClassWOC());
 		System.out.println("LOC: "+ getClassLOC());
+		System.out.println("NOAM: "+ getNOAM());
 		System.out.println("intensive coupling: " + isIntensiveCoupling());
 		System.out.println("dispersed coupling: " + isDispersedCoupling());
 
@@ -123,4 +126,11 @@ public class ClassInformation {
 		System.out.println("");
 	}
 
+	public void setNOAM(int n) {
+		noam = n;
+	}
+
+	public int getNOAM() {
+		return noam;
+	}
 }

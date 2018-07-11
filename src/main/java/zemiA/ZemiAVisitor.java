@@ -16,7 +16,9 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.ReturnStatement;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class ZemiAVisitor extends ASTVisitor {
 	/*
@@ -29,15 +31,17 @@ public class ZemiAVisitor extends ASTVisitor {
 	private int privatefields;
 
 	CompilationUnit unit;
-	private String methodname;
+	private IMethodBinding methodname;
 	private Map<String, Boolean> fieldmap = new HashMap<String, Boolean>();
+	private ArrayList<String> fieldlist = new ArrayList<String>();
 	private ArrayList<String> methodlist = new ArrayList<String>();
-	private Map<String, Boolean> accessormethodmap = new HashMap<String, Boolean>();
+//	private Map<String, Boolean> accessormethodmap = new HashMap<String, Boolean>();
 	private Map<String, Integer> methodLOCmap = new HashMap<String, Integer>();
 	private int publicFunctionalMethod;
 	private int publicMethod;
 	private int woc;
 	private int classLOC;
+	private int noam = 0;
 	/* ================= */
 
 	private int nesting = 0;
@@ -154,6 +158,12 @@ public class ZemiAVisitor extends ASTVisitor {
 		}
 		classLOC = unit.getLineNumber(node.getStartPosition() + node.getLength() - 1) + 1
 				- unit.getLineNumber(node.getStartPosition());
+//		for(FieldDeclaration vb: node.getFields()) {
+//			System.out.println(vb.toString());
+//			System.out.println(vb.fragments().get(0).toString());
+//		}
+//		System.out.println("*");
+//			System.out.println(node.resolveBinding().getDeclaringMember());
 		return super.visit(node);
 	}
 
@@ -168,6 +178,8 @@ public class ZemiAVisitor extends ASTVisitor {
 		}
 		searchedClass.setClassWOC(woc);
 		searchedClass.setClassLOC(classLOC);
+		searchedClass.setNOAM(noam);
+		noam=0;
 		super.endVisit(node);
 	}
 
@@ -184,12 +196,12 @@ public class ZemiAVisitor extends ASTVisitor {
 		MethodInformation aaa = getMethodInformation(node.resolveBinding());
 		aaa.setMethodLOC(unit.getLineNumber(node.getStartPosition() + node.getLength() - 1) + 1
 				- unit.getLineNumber(node.getStartPosition()));
-		methodname = node.getName().toString();
-		accessormethodmap.put(methodname, Boolean.FALSE);
-		methodlist.add(methodname);
+		methodname = node.resolveBinding();
+//		accessormethodmap.put(methodname, Boolean.FALSE);
+//		methodlist.add(methodname);
 		int methodloc = unit.getLineNumber(node.getStartPosition() + node.getLength() - 1) + 1
 				- unit.getLineNumber(node.getStartPosition());
-		methodLOCmap.put(methodname, methodloc);
+//		methodLOCmap.put(methodname, methodloc);
 		/* ============== */
 		return super.visit(node);
 	}
@@ -236,19 +248,22 @@ public class ZemiAVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(ReturnStatement node) {
-		// System.out.println(node.getExpression());
+//		 System.out.println(node.getExpression());
+		MethodInformation m = this.getMethodInformation(methodname);
 		if (node.getExpression() == null) {
 
 		} else if (node.getExpression().toString().startsWith("this")) {
-			// System.out.println("getter method");
+//			 System.out.println("<<getter method>>");
 			this.publicFunctionalMethod--;
-			accessormethodmap.replace(methodname, Boolean.TRUE);
-		} else if (fieldmap.get(node.getExpression().toString()) == null) {
-			// System.out.println("normal method");
-		} else if (fieldmap.get(node.getExpression().toString())) {
-			// System.out.println("*"+"getter method"+"*");
+//			accessormethodmap.replace(methodname, Boolean.TRUE);
+			m.setAccessor(true);
+			noam+=1;
+		} else if (fieldlist.contains(node.getExpression().toString())) {
+//			 System.out.println("*"+"<<getter method>>"+"*");
 			this.publicFunctionalMethod--;
-			accessormethodmap.replace(methodname, Boolean.TRUE);
+//			accessormethodmap.replace(methodname, Boolean.TRUE);
+			m.setAccessor(true);
+			noam+=1;
 		}
 		return super.visit(node);
 	}
@@ -258,11 +273,13 @@ public class ZemiAVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(FieldDeclaration node) {
-		//System.out.print(node.toString());
+//		System.out.println(node.fragments());
+//		System.out.println(node.getType());
 		if (Modifier.isPublic(node.getModifiers())) {
 			this.privatefields += 1;
 			//System.out.println("isPublic");
 		}
+//		fieldlist.add(node.toString());
 		//System.out.println(this.privatefields);
 		return super.visit(node);
 	}
@@ -270,6 +287,24 @@ public class ZemiAVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(CompilationUnit node) {
 		unit = node;
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(SimpleName node) {
+		if(node.isDeclaration()) {
+//			System.out.println("*"+node.getIdentifier()+"*");
+		}
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(VariableDeclarationFragment node) {
+//			System.out.println("*"+node.getName());
+			if(node.resolveBinding().isField()) {
+//				System.out.println("*"+node.getName());
+				fieldlist.add(node.getName().toString());
+			}
 		return super.visit(node);
 	}
 
