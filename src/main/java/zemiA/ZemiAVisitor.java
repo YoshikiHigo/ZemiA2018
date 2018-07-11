@@ -29,7 +29,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	 * project
 	 */
 	/* =========== */
-	private int privatefields;
+	private int publicfields;
 
 	CompilationUnit unit;
 	private IMethodBinding methodname;
@@ -43,6 +43,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	private int woc;
 	private int classLOC;
 	private int noam = 0;
+//	public int dummy;//NOPA test
 	/* ================= */
 
 	private int nesting = 0;
@@ -179,8 +180,10 @@ public class ZemiAVisitor extends ASTVisitor {
 		}
 		searchedClass.setClassWOC(woc);
 		searchedClass.setClassLOC(classLOC);
-		searchedClass.setNOAM(noam);
-		noam=0;
+		searchedClass.setNOAM(this.noam);
+		searchedClass.setNOPA(this.publicfields);
+		this.noam=0;
+		this.publicfields=0;
 		super.endVisit(node);
 	}
 
@@ -282,11 +285,11 @@ public class ZemiAVisitor extends ASTVisitor {
 //		System.out.println(node.fragments());
 //		System.out.println(node.getType());
 		if (Modifier.isPublic(node.getModifiers())) {
-			this.privatefields += 1;
+			this.publicfields += 1;
 			//System.out.println("isPublic");
 		}
 //		fieldlist.add(node.toString());
-		//System.out.println(this.privatefields);
+//		System.out.println(this.publicfields);
 		return super.visit(node);
 	}
 

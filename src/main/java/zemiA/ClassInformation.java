@@ -18,6 +18,9 @@ public class ClassInformation {
 	private int classLOC = 0;
 
 	private int noam=0;//the Number of Acceccor Methods
+	private int nopa=0;//the Number Of Public Attributes
+
+//	public int dummy;//NOPA test
 
 	public ClassInformation(ITypeBinding typeBinding) {
 		classBind = typeBinding;
@@ -113,6 +116,7 @@ public class ClassInformation {
 		System.out.println("WOC: "+ getClassWOC());
 		System.out.println("LOC: "+ getClassLOC());
 		System.out.println("NOAM: "+ getNOAM());
+		System.out.println("NOPA: "+ getNOPA());
 		System.out.println("intensive coupling: " + isIntensiveCoupling());
 		System.out.println("dispersed coupling: " + isDispersedCoupling());
 
@@ -132,5 +136,13 @@ public class ClassInformation {
 
 	public int getNOAM() {
 		return noam;
+	}
+
+	public void setNOPA(int argnopa) {
+		this.nopa = argnopa;
+	}
+
+	public int getNOPA() {
+		return this.nopa;
 	}
 }
