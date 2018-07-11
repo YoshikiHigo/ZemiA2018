@@ -36,10 +36,6 @@ public class ClassInformation {
 	private List<IMethodBinding> usedSuperMethods;
 
 
-
-	public static final int FOR_DISPLAY = 0;
-	public static final int FOR_REFACTORING = 1;
-
 	public ClassInformation(ITypeBinding typeBinding) {
 		classBind = typeBinding;
 		className = classBind.getName().toString();
@@ -77,31 +73,28 @@ public class ClassInformation {
 	}
 
 
-	public void printClassInformation(int mode) {
-		if(mode == FOR_DISPLAY || mode == FOR_REFACTORING) {
-			System.out.println("Class name: "+ className);
-			if(parentName != null)System.out.println("Parent Class name: "+parentName);
-			System.out.println("NOM: "+nom);
-			System.out.println("WMC: "+wmc);
-			System.out.println("AMW: "+amw);
-			System.out.println("NProtM: "+nprotm);
-			if(bovr!=-1)System.out.println("BOvR: "+ bovr);
-			else System.out.println("BOvR: parent class is made by third party");
-			if(nas!=-1)System.out.println("NAS: "+nas);
-			else System.out.println("NAS: parent class is made by third party");
-			if(pnas!=-1)System.out.println("PNAS:" +pnas);
-			else System.out.println("PNAS: parent class is made by third party");
-			if(bur!=-1)System.out.println("BUR: "+bur);
-			else System.out.println("BUR: parent class is made by third party");
-			System.out.println("Refused Parent Bequest: "+this.isRPB());
-			System.out.println("Tradition Breaker: "+this.isTB());
-		}
+	public void printClassInformation() {
+		System.out.println("Class name: "+ className);
+		if(parentName != null)System.out.println("Parent Class name: "+parentName);
+		System.out.println("NOM: "+nom);
+		System.out.println("WMC: "+wmc);
+		System.out.println("AMW: "+amw);
+		System.out.println("NProtM: "+nprotm);
+		if(bovr!=-1)System.out.println("BOvR: "+ bovr);
+		else System.out.println("BOvR: parent class is made by third party");
+		if(nas!=-1)System.out.println("NAS: "+nas);
+		else System.out.println("NAS: parent class is made by third party");
+		if(pnas!=-1)System.out.println("PNAS:" +pnas);
+		else System.out.println("PNAS: parent class is made by third party");
+		if(bur!=-1)System.out.println("BUR: "+bur);
+		else System.out.println("BUR: parent class is made by third party");
+		System.out.println("Refused Parent Bequest: "+this.isRPB());
+		System.out.println("Tradition Breaker: "+this.isTB());
 
-		if(mode == FOR_REFACTORING) {
-			// for refactoring
-			System.out.println("----- print information for refactoring -----");
-
-		}
+//		System.out.println("------------this class's method information------------");
+//		for(MethodInformation classMethod: classMethodsInformation) {
+//			classMethod.printMethodInfomation();
+//		}
 
 		System.out.println();
 	}
@@ -113,6 +106,7 @@ public class ClassInformation {
 				return classInformation;
 			}
 		}
+		// if the class is not project class
 		return null;
 	}
 	public ITypeBinding getParentBindig() {

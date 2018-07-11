@@ -64,6 +64,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	public void endVisit(CompilationUnit node) {
 		// Judgement over Project by List
 
+		//chapter 6
 		for(MethodInvocation invokedMethod: allInvokedMethods) {
 			IMethodBinding invokedMethodBind = invokedMethod.resolveMethodBinding();
 			IMethodBinding invokingMethodBind = allInvokingMethods.get(invokedMethod).resolveBinding();
@@ -75,9 +76,7 @@ public class ZemiAVisitor extends ASTVisitor {
 			}
 		}
 
-
-
-
+		//chapter 7
 		for(ClassInformation Data : allDeclaratedClasses) {
 			ClassInformation pData = getClassInformation(Data.getParentBindig());
 			if(pData != null) {
@@ -102,15 +101,10 @@ public class ZemiAVisitor extends ASTVisitor {
 
 
 
-
-
-
-
-
 		// Print Class Informations
 		System.out.println("print class informations: ");
 		for(ClassInformation classInformation: allDeclaratedClasses) {
-			classInformation.printClassInformation(ClassInformation.FOR_DISPLAY);
+			classInformation.printClassInformation();
 
 		}
 
@@ -122,7 +116,7 @@ public class ZemiAVisitor extends ASTVisitor {
 //		}
 		for(MethodInformation m: allDeclaratedMethods) {
 			//System.out.println(m.getMethodBinding().getName().toString()); //TODO why this line comment out cause bag?
-			m.printMethodInfomation(MethodInformation.FOR_REFACTORING);
+			m.printMethodInfomation();
 		}
 		System.out.println();
 
