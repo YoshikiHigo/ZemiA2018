@@ -35,13 +35,12 @@ public class ZemiAVisitor extends ASTVisitor {
 	private int nesting = 0;
 	private int maxNesting = 0;
 	private List<IMethodBinding> classMethods;
-	private List<ClassInformation> allDeclaratedClasses = new ArrayList<ClassInformation>();
-	private List<MethodInformation> allDeclaratedMethods = new ArrayList<MethodInformation>();
+	private List<ClassInformation> allDeclaratedClasses = new ArrayList<ClassInformation>();  //project's classes
+	private List<MethodInformation> allDeclaratedMethods = new ArrayList<MethodInformation>();  //project's methods
 	private List<MethodInvocation> allInvokedMethods = new ArrayList<MethodInvocation>();
 	private HashMap<MethodInvocation,MethodDeclaration> allInvokingMethods =
 			new HashMap<MethodInvocation,MethodDeclaration>();  //method invocation is unique
 	private Stack<MethodDeclaration> methodDeclarationStack = new Stack<MethodDeclaration>();
-	
 
 	private List<IVariableBinding> usedSuperFields;
 	private List<IMethodBinding> usedSuperMethods;
@@ -184,6 +183,7 @@ public class ZemiAVisitor extends ASTVisitor {
 			classMethods.add(mb.resolveBinding());
 			allDeclaratedMethods.add(new MethodInformation(mb.resolveBinding()));
 		}
+
 		return super.visit(node);
 	}
 
