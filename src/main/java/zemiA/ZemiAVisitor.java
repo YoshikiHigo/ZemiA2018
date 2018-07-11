@@ -104,7 +104,7 @@ public class ZemiAVisitor extends ASTVisitor {
 		// prepare to search next class :Initialize
 		maxNesting = 0;
 		classMethods = new ArrayList<IMethodBinding>();
-		allDeclaratedClasses.add(new ClassInformation(node.resolveBinding()));
+		//allDeclaratedClasses.add(new ClassInformation(node.resolveBinding()));
 
 		for(MethodDeclaration mb: node.getMethods()) {
 			classMethods.add(mb.resolveBinding());
@@ -116,9 +116,11 @@ public class ZemiAVisitor extends ASTVisitor {
 	@Override
 	public void endVisit(TypeDeclaration node) {
 		// set searched class information
-		ClassInformation searchedClass = getClassInformation(node.resolveBinding());
-		searchedClass.setMethodList(classMethods);
-		searchedClass.setMaxNesting(maxNesting);
+		ClassInformation checkedClass = new ClassInformation(node.resolveBinding());
+		allDeclaratedClasses.add(checkedClass);
+		//ClassInformation searchedClass = getClassInformation(node.resolveBinding());
+		checkedClass.setMethodList(classMethods);
+		checkedClass.setMaxNesting(maxNesting);
 		super.endVisit(node);
 	}
 
