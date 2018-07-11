@@ -15,6 +15,7 @@ public class MethodInformation{
 	private List<ITypeBinding> invokingClasses = new ArrayList<ITypeBinding>();
 
 	private boolean accessor = false;
+	private List<String> parameters = new ArrayList<String>();
 
 	public MethodInformation(IMethodBinding declaratedMethodBind) {
 		methodBind = declaratedMethodBind;
@@ -33,6 +34,14 @@ public class MethodInformation{
 
 	public void setAccessor(boolean b) {
 		accessor = b;
+	}
+
+	public void setParameter(String s) {
+		this.parameters.add(s);
+	}
+
+	public List<String> getParameter(){
+		return this.parameters;
 	}
 
 	// CM: times of invocated by distinct method

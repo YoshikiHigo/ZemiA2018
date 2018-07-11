@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -202,6 +203,11 @@ public class ZemiAVisitor extends ASTVisitor {
 		int methodloc = unit.getLineNumber(node.getStartPosition() + node.getLength() - 1) + 1
 				- unit.getLineNumber(node.getStartPosition());
 //		methodLOCmap.put(methodname, methodloc);
+		for(Object para:node.parameters()) {
+//			System.out.println(node.parameters());
+//			System.out.println(para.toString());
+			aaa.setParameter(para.toString());
+		}
 		/* ============== */
 		return super.visit(node);
 	}
@@ -305,6 +311,24 @@ public class ZemiAVisitor extends ASTVisitor {
 //				System.out.println("*"+node.getName());
 				fieldlist.add(node.getName().toString());
 			}
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(Assignment node) {
+//			System.out.println("*"+node.getIdentifier()+"*");
+//		System.out.println("*"+node.getLeftHandSide()+node.getOperator()+node.getRightHandSide());
+		MethodInformation aaa = getMethodInformation(methodname);
+		List<String> parameters = aaa.getParameter();
+		if(fieldlist.contains(node.getLeftHandSide().toString())) {
+			for(String para:parameters) {
+				if(para.contains(node.getRightHandSide().toString())) {
+//					System.out.println(methodname);
+					aaa.setAccessor(true);
+					noam+=1;
+				}
+			}
+		}
 		return super.visit(node);
 	}
 
