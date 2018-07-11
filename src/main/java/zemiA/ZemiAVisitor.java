@@ -38,8 +38,8 @@ public class ZemiAVisitor extends ASTVisitor {
     methodname = node.getName().toString();
 	accessormethodmap.put(methodname, Boolean.FALSE);
 	methodlist.add(methodname);
-	System.out.println("*"+node.getName()+"*");
-	System.out.println(node.resolveBinding().getDeclaringClass());
+//	System.out.println("*"+node.getName()+"*");
+//	System.out.println(node.resolveBinding().getDeclaringClass());
 
     return super.visit(node);
   }
@@ -66,16 +66,25 @@ public class ZemiAVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(ReturnStatement node) {
 		System.out.println(node.getExpression());
-		if(node.getExpression().toString().startsWith("this")) {
-			System.out.println("getter method");
+		if(node.getExpression()==null) {
+			
+		}else if(node.getExpression().toString().startsWith("this")) {
+//			System.out.println("getter method");
 			accessormethodmap.replace(methodname, Boolean.TRUE);
 		}else if(fieldmap.get(node.getExpression().toString())==null) {
-			System.out.println("normal method");
+//			System.out.println("normal method");
 		}else if(fieldmap.get(node.getExpression().toString())) {
-			System.out.println("*"+"getter method"+"*");
+//			System.out.println("*"+"getter method"+"*");
 			accessormethodmap.replace(methodname, Boolean.TRUE);
 		}
 		return super.visit(node);
+	}
+	
+	@Override
+	public void endVisit(CompilationUnit node) {
+		for(String method : methodlist) {
+			System.out.println(method+"="+accessormethodmap.get(method));
+		}
 	}
 
 
