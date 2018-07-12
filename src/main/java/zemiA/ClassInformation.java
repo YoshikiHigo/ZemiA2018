@@ -19,7 +19,8 @@ public class ClassInformation {
 
 	private int noam=0;//the Number of Acceccor Methods
 	private int nopa=0;//the Number Of Public Attributes
-	private int classatfd;
+	private int classatfd=0;
+	private double tcc=0;
 	private List<IMethodBinding> invokingmethod = new ArrayList<IMethodBinding>();
 	private List<String> declaringfieldlist = new ArrayList<String>();
 
@@ -121,6 +122,7 @@ public class ClassInformation {
 		System.out.println("NOAM: "+ getNOAM());
 		System.out.println("NOPA: "+ getNOPA());
 		System.out.println("ATFD: "+ getClassATFD());
+		System.out.println("TCC: "+ getTCC());
 		System.out.println("intensive coupling: " + isIntensiveCoupling());
 		System.out.println("dispersed coupling: " + isDispersedCoupling());
 
@@ -180,5 +182,13 @@ public class ClassInformation {
 
 	public boolean isDefined(String fieldname) {
 		return this.declaringfieldlist.contains(fieldname);
+	}
+
+	public void setTCC(double argtcc) {
+		this.tcc = argtcc;
+	}
+
+	public double getTCC() {
+		return this.tcc;
 	}
 }

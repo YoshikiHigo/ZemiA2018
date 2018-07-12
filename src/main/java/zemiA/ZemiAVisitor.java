@@ -174,6 +174,66 @@ public class ZemiAVisitor extends ASTVisitor {
 			this.classATFDdirect=0;
 		}
 
+		for(ClassInformation classinformation : allDeclaratedClasses) {
+			List<String> classfields = classinformation.getDeclaringFieldList();
+			List<IMethodBinding> classmethods = classinformation.getMethodsList();
+			int nofield = classfields.size();
+			int length=classmethods.size();
+			boolean[][] relation = new boolean[nofield][length];
+			for(int i = 0;i<nofield;i++) {
+				int noftrueprev=0;
+				for(int j = 0;j<length;j++) {
+					relation[i][j]=getMethodInformation(classmethods.get(j)).isAccessed(classfields.get(i));
+					if(relation[i][j]) {
+						noftrueprev+=1;
+					}
+				}
+				boolean conti=true;
+				do {
+					int noftrue=0;
+					for(int j = 0;j<length;j++) {
+						if(relation[i][j]) {
+							for(int k=0;k<length;k++) {
+								boolean temp = getMethodInformation(classmethods.get(j)).isInvoked(classmethods.get(k));
+								relation[i][k]=relation[i][k]||temp;
+							}
+						}
+					}
+					for(int j = 0;j<length;j++) {
+						if(relation[i][j]) {
+							noftrue+=1;
+						}
+					}
+					if(noftrue==noftrueprev) {
+						conti=false;
+					}else {
+						conti=true;
+						noftrueprev=noftrue;
+						noftrue=0;
+					}
+				}while(conti);
+			}
+			int pair=0;
+			boolean makepair=false;
+			for(int i = 0;i<length;i++) {
+				for(int j = i;j<length;j++) {
+					if(i!=j) {
+						for(int k = 0;k<nofield;k++) {
+							makepair = makepair || (relation[k][i] && relation[k][j]);
+						}
+						if(makepair) {
+							pair+=1;
+						}
+					}else {
+
+					}
+				}
+			}
+			int maxpair = length*(length-1)/2;
+			double tcc = (double) pair/maxpair;
+			classinformation.setTCC(tcc);
+		}
+
 		// Print Class Informations
 		for (ClassInformation classInformation : allDeclaratedClasses) {
 			classInformation.printClassInformation();

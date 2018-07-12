@@ -117,6 +117,14 @@ public class MethodInformation{
 		return this.methodatfd;
 	}
 
+	public boolean isAccessed(String s) {
+		return this.accessedfeildlist.contains(s);
+	}
+
+	public boolean isInvoked(IMethodBinding mb) {
+		return this.invokingmethod.contains(mb);
+	}
+
 	public void setProviderClasses(ITypeBinding tp) {
 		if(this.declaringclass.equals(tp)) {
 			this.fromownclass+=1;
