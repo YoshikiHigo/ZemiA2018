@@ -54,8 +54,8 @@ public class ZemiAMain {
 					}
 				}
 				final Document document = new Document(text);
-				
-				
+
+
 				if (text!=null) {
 					final ASTParser parser = ASTParser.newParser(AST.JLS10);
 					//parser.setSource(String.join(System.lineSeparator(), lines).toCharArray());
@@ -65,38 +65,40 @@ public class ZemiAMain {
 					parser.setResolveBindings(true);
 					parser.setBindingsRecovery(true);
 					parser.setStatementsRecovery(true);
-	
+
 					if (sourceDirectories.isEmpty()) {
 						sourceDirectories.add(inputFile.getParentFile().getAbsolutePath());
 					}
-	
+
 					parser.setEnvironment(classpathEntries.toArray(new String[0]),
 							sourceDirectories.toArray(new String[0]), null, true);
-	
+
 					final Map<String, String> options = DefaultCodeFormatterConstants.getEclipseDefaultSettings();
 					options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_8);
 					options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_8);
 					options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
-	
+
 					parser.setCompilerOptions(options);
-	
+
 					final CompilationUnit unit = (CompilationUnit) parser.createAST(null);
 					//final AST ast = unit.getAST();
 					//final ASTRewrite rewriter = ASTRewrite.create(ast);
 					unit.recordModifications();
-	
+
 					//final ZemiAVisitor visitor = new ZemiAVisitor();
 					final ZemiAVisitor visitor = new ZemiAVisitor();
 					unit.accept(visitor);
-					
+
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		
-		
+
+
+		int numberOfClass=6;
+        Visualizer Vi=new Visualizer();
+        Vi.visualize(numberOfClass);
 	}
 
 
