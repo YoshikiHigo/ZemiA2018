@@ -41,10 +41,6 @@ public class ClassInformation {
 		className = classBind.getName().toString();
 	}
 
-	public void addMethodInformation(MethodInformation methodInformation) {
-
-	}
-
 	public ITypeBinding getClassBinding() {
 		return classBind;
 	}
