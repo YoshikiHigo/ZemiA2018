@@ -43,7 +43,6 @@ public class MethodInformation{
 		maxNesting = MAXNESTING;
 	}
 
-
 	public int getCINT() {
 		return cint;
 	}

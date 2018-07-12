@@ -39,6 +39,9 @@ public class ClassInformation {
 	public ClassInformation(ITypeBinding typeBinding) {
 		classBind = typeBinding;
 		className = classBind.getName().toString();
+	}
+
+	public void addMethodInformation(MethodInformation methodInformation) {
 
 	}
 
@@ -46,26 +49,24 @@ public class ClassInformation {
 		return classBind;
 	}
 
-	public void setMethodList(List<IMethodBinding> methods) {
-		classMethods = methods;
-		for(IMethodBinding classMethod: classMethods) {
-			classMethodsInformation.add(MethodInformation.getMethodInformation(classMethod, classMethodsInformation));
-		}
-	}
+	//legacy
+//	public void setMethodList(List<IMethodBinding> methods) {
+//		classMethods = methods;
+//	}
 
 	public List<IMethodBinding> getMethodsList(){
 		return classMethods;
 	}
 
-
-	public boolean setMaxNesting(int nesting) {
-		if(nesting<0) {
-			return false;
-		}else {
-			maxNesting = nesting;
-			return true;
-		}
-	}
+	//legacy
+//	public boolean setMaxNesting(int nesting) {
+//		if(nesting<0) {
+//			return false;
+//		}else {
+//			maxNesting = nesting;
+//			return true;
+//		}
+//	}
 
 	public int getMaxNesting() {
 		//maxNesting include method definition block
@@ -73,7 +74,7 @@ public class ClassInformation {
 	}
 
 
-	public void printClassInformation() {
+	public void printClassInformation(List<MethodInformation> allDeclaratedMethods) {
 		System.out.println("Class name: "+ className);
 		if(parentName != null)System.out.println("Parent Class name: "+parentName);
 		System.out.println("NOM: "+nom);
@@ -91,10 +92,13 @@ public class ClassInformation {
 		System.out.println("Refused Parent Bequest: "+this.isRPB());
 		System.out.println("Tradition Breaker: "+this.isTB());
 
-//		System.out.println("------------this class's method information------------");
-//		for(MethodInformation classMethod: classMethodsInformation) {
-//			classMethod.printMethodInfomation();
-//		}
+		for(IMethodBinding classMethod: classMethods) {
+			classMethodsInformation.add(MethodInformation.getMethodInformation(classMethod, allDeclaratedMethods));
+		}
+		System.out.println("------------this class's method information------------");
+		for(MethodInformation classMethod: classMethodsInformation) {
+			classMethod.printMethodInfomation();
+		}
 
 		System.out.println();
 	}

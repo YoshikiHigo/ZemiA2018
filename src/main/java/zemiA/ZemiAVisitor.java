@@ -104,20 +104,22 @@ public class ZemiAVisitor extends ASTVisitor {
 		// Print Class Informations
 		System.out.println("print class informations: ");
 		for(ClassInformation classInformation: allDeclaratedClasses) {
-			classInformation.printClassInformation();
+			classInformation.printClassInformation(allDeclaratedMethods);
 
 		}
 
 		// Print Project Information
-		System.out.println("print project informations: ");
+		//System.out.println("print project informations: ");
 //		for(MethodInformation m: getShotgunSurgeryMethodList()) {
 //			System.out.println(m.getMethodBinding().getName().toString()); //TODO why this line comment out cause bag?
 //			m.printMethodInfomation(MethodInformation.FOR_DISPLAY);
 //		}
-		for(MethodInformation m: allDeclaratedMethods) {
-			//System.out.println(m.getMethodBinding().getName().toString()); //TODO why this line comment out cause bag?
-			m.printMethodInfomation();
-		}
+
+//		for(MethodInformation m: allDeclaratedMethods) {
+//			//System.out.println(m.getMethodBinding().getName().toString()); //TODO why this line comment out cause bag?
+//			m.printMethodInfomation();
+//		}
+
 		System.out.println();
 
 		super.endVisit(node);
