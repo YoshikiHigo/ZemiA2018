@@ -19,8 +19,7 @@ public class ClassInformation {
 
 	private int noam=0;//the Number of Acceccor Methods
 	private int nopa=0;//the Number Of Public Attributes
-	private int classatfddirect=0;
-	private int classatfdviamethod=0;
+	private int classatfd;
 	private List<IMethodBinding> invokingmethod = new ArrayList<IMethodBinding>();
 	private List<String> declaringfieldlist = new ArrayList<String>();
 
@@ -152,11 +151,11 @@ public class ClassInformation {
 	}
 
 	public void setClassATFD(int argclassatfd) {
-		this.classatfddirect = argclassatfd;
+		this.classatfd = argclassatfd;
 	}
 
 	public int getClassATFD() {
-		return this.classatfddirect+this.classatfdviamethod;
+		return this.classatfd;
 	}
 
 	public void setInvokingMethods(IMethodBinding mb) {

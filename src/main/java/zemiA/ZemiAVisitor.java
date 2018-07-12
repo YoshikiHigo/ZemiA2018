@@ -137,6 +137,43 @@ public class ZemiAVisitor extends ASTVisitor {
 			this.methodATFDviaaccessor=0;
 		}
 
+		for(ClassInformation classinformation : allDeclaratedClasses) {
+			List<String> classaccessedfields = new ArrayList<String>();
+			for(IMethodBinding declaredmethod : classinformation.getMethodsList()) {
+				MethodInformation method = getMethodInformation(declaredmethod);
+				for(String s : method.getAccessedFields()) {
+					if(!classaccessedfields.contains(s)) {
+						classaccessedfields.add(s);
+					}
+				}
+			}
+			for(String accessedfield:classaccessedfields) {
+				if(!classinformation.isDefined(accessedfield)) {
+					this.classATFDdirect+=1;
+				}
+			}
+			List<IMethodBinding> classinvokedmethodlist = new ArrayList<IMethodBinding>();
+			for(IMethodBinding declaredmethod : classinformation.getMethodsList()) {
+				MethodInformation method = getMethodInformation(declaredmethod);
+				for(IMethodBinding mb : method.getInvokingMethods()) {
+					if(!classinvokedmethodlist.contains(mb)) {
+						classinvokedmethodlist.add(mb);
+					}
+				}
+			}
+			for(IMethodBinding mb : classinvokedmethodlist) {
+				MethodInformation method = getMethodInformation(mb);
+				if(method!=null) {
+					if(method.isAccessor()) {
+						this.classATFDviaaccessor+=1;
+					}
+				}
+			}
+			classinformation.setClassATFD(this.classATFDdirect+this.classATFDviaaccessor);
+			this.classATFDviaaccessor=0;
+			this.classATFDdirect=0;
+		}
+
 		// Print Class Informations
 		for (ClassInformation classInformation : allDeclaratedClasses) {
 			classInformation.printClassInformation();
