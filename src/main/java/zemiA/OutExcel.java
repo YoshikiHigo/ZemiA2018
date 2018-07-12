@@ -35,7 +35,8 @@ public class OutExcel {
 	    a = row.createCell(0);
 	    b = row.createCell(1);
 	    a.setCellValue("Parent Class name"); 
-	    b.setCellValue(Data.getParentBindig().getBinaryName());
+	    if(Data.getParentBindig() != null) b.setCellValue(Data.getParentBindig().getBinaryName());
+	    else b.setCellValue("has no parent");
 	    
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
@@ -64,26 +65,34 @@ public class OutExcel {
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
-	    a.setCellValue("BOvR"); 
+	    a.setCellValue("BOvR");
+	    if(Data.getBOvR() != -1)
 	    b.setCellValue(Data.getBOvR());
+	    else b.setCellValue("parent is a third-party class");
 	    
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
 	    a.setCellValue("NAS"); 
+	    if(Data.getNAS() != -1)
 	    b.setCellValue(Data.getNAS());
+	    else b.setCellValue("parent is a third-party class");
 	    
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
 	    a.setCellValue("PNAS"); 
+	    if(Data.getPNAS() != -1)
 	    b.setCellValue(Data.getPNAS());
+	    else b.setCellValue("parent is a third-party class");
 	    
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
 	    a.setCellValue("BUR"); 
+	    if(Data.getBUR() != -1)
 	    b.setCellValue(Data.getBUR());
+	    else b.setCellValue("parent is a third-party class");
 	    
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
