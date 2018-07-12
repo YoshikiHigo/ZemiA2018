@@ -116,30 +116,6 @@ public class ClassInformation {
 	public ITypeBinding getParentBindig() {
 		return parentBinding;
 	}
-
-
-
-	public double getBOvR() {
-		return bovr;
-	}
-	public void setBOvR(double BOvR) {
-		if(nom != 0) bovr = BOvR/nom;
-	}
-	public int getNAS() {
-		return nas;
-	}
-	public void setNAS(int NAS) {
-		nas = pmlist.size() - NAS;
-	}
-	public double getPNAS() {
-		return pnas;
-	}
-	public void setPNAS() {
-		if(pmlist.size() != 0)pnas = (double)nas/pmlist.size();
-	}
-	public double getBUR() {
-		return bur;
-	}
 	public void setBUR(int BUR) {
 		if(BUR != 0)bur = (double)(usedSuperFields.size()+usedSuperMethods.size())/BUR;
 	}
@@ -197,10 +173,13 @@ public class ClassInformation {
 	public String getName() {
 		return className;
 	}
+	public List<MethodInformation> getMethodInformation(){
+		return classMethodsInformation;
+	}
 	
 
 	public boolean isRPB() {
-		if(parentClass != null) return ((nprotm > 3 && bur < (double)1/3) || bovr < (double)1/3)
+		if(parentClass != null) return ((parentClass.getNProtM() > 3 && bur < (double)1/3) || bovr < (double)1/3)
 				&& ((amw > 2.0 || wmc > 14) && nom > 7);
 		else return false;
 	}
