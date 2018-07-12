@@ -199,7 +199,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		// to access from MethodInvocation to MethodDeclaration
-		methodDeclarationStack.push(node);
+		methodDeclarationStack.push(node);		
 		
 		NOM++;
 		if((Modifier.PUBLIC & node.getModifiers()) != 0) {

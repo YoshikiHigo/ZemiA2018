@@ -15,11 +15,8 @@ public class OutExcel {
 
   OutExcel(List<ClassInformation> allDeclaratedClasses) throws IOException {
 
-    // Excel2007以降の「.xlsx」形式のファイルの素を作成
     Workbook book = new XSSFWorkbook();
     int i = 0;
-
-    // シートを「サンプル」という名前で作成
 
     for(ClassInformation Data : allDeclaratedClasses) {
     	
@@ -64,18 +61,6 @@ public class OutExcel {
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
-	    a.setCellValue("CINT"); 
-	    b.setCellValue(Data.getCINT());
-	    
-	    row = sheet.createRow(i++);
-	    a = row.createCell(0);
-	    b = row.createCell(1);
-	    a.setCellValue("CDISP"); 
-	    b.setCellValue(Data.getCDISP());
-	    
-	    row = sheet.createRow(i++);
-	    a = row.createCell(0);
-	    b = row.createCell(1);
 	    a.setCellValue("BOvR"); 
 	    b.setCellValue(Data.getBOvR());
 	    
@@ -96,18 +81,6 @@ public class OutExcel {
 	    b = row.createCell(1);
 	    a.setCellValue("BUR"); 
 	    b.setCellValue(Data.getBUR());
-	    
-	    row = sheet.createRow(i++);
-	    a = row.createCell(0);
-	    b = row.createCell(1);
-	    a.setCellValue("intensive coupling"); 
-	    b.setCellValue(Data.isIntensiveCoupling());
-	    
-	    row = sheet.createRow(i++);
-	    a = row.createCell(0);
-	    b = row.createCell(1);
-	    a.setCellValue("dispersed coupling"); 
-	    b.setCellValue(Data.isDispersedCoupling());
 	    
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
