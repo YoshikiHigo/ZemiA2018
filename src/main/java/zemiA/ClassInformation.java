@@ -19,6 +19,10 @@ public class ClassInformation {
 
 	private int noam=0;//the Number of Acceccor Methods
 	private int nopa=0;//the Number Of Public Attributes
+	private int classatfddirect=0;
+	private int classatfdviamethod=0;
+	private List<IMethodBinding> invokingmethod = new ArrayList<IMethodBinding>();
+	private List<String> declaringfieldlist = new ArrayList<String>();
 
 //	public int dummy;//NOPA test
 
@@ -117,6 +121,7 @@ public class ClassInformation {
 		System.out.println("LOC: "+ getClassLOC());
 		System.out.println("NOAM: "+ getNOAM());
 		System.out.println("NOPA: "+ getNOPA());
+		System.out.println("ATFD: "+ getClassATFD());
 		System.out.println("intensive coupling: " + isIntensiveCoupling());
 		System.out.println("dispersed coupling: " + isDispersedCoupling());
 
@@ -144,5 +149,37 @@ public class ClassInformation {
 
 	public int getNOPA() {
 		return this.nopa;
+	}
+
+	public void setClassATFD(int argclassatfd) {
+		this.classatfddirect = argclassatfd;
+	}
+
+	public int getClassATFD() {
+		return this.classatfddirect+this.classatfdviamethod;
+	}
+
+	public void setInvokingMethods(IMethodBinding mb) {
+		this.invokingmethod.add(mb);
+	}
+
+	public List<IMethodBinding> getInvokingMethods() {
+		return this.invokingmethod;
+	}
+
+	public void setDeclaringFieldList(String s) {
+		this.declaringfieldlist.add(s);
+	}
+
+	public List<String> getDeclaringFieldList() {
+		return this.declaringfieldlist;
+	}
+
+	public boolean isDefined(IMethodBinding mb) {
+		return this.classMethods.contains(mb);
+	}
+
+	public boolean isDefined(String fieldname) {
+		return this.declaringfieldlist.contains(fieldname);
 	}
 }
