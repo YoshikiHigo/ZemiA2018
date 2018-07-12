@@ -24,7 +24,7 @@ public class ZemiAMain {
 	private static List<String> classpathEntries = new ArrayList<>();
 
 	@SuppressWarnings("unchecked")
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {		
 
 		if (classpathEntries.isEmpty()) {
 			final String systemLibraries = System.getProperty("java.class.path");
@@ -88,6 +88,13 @@ public class ZemiAMain {
 					//final ZemiAVisitor visitor = new ZemiAVisitor();
 					final ZemiAVisitor visitor = new ZemiAVisitor();
 					unit.accept(visitor);
+					
+					
+					
+					OutExcel out = new OutExcel(visitor.getClassInformation());
+					
+					
+					
 					
 				}
 			}

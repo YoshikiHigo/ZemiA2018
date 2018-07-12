@@ -103,7 +103,7 @@ public class ClassInformation {
 		System.out.println();
 	}
 
-
+  
 	public static ClassInformation getClassInformation(ITypeBinding classBind, List<ClassInformation> classes) {
 		for(ClassInformation classInformation: classes) {
 			if(classInformation.getClassBinding().equals(classBind)) {
@@ -116,6 +116,7 @@ public class ClassInformation {
 	public ITypeBinding getParentBindig() {
 		return parentBinding;
 	}
+
 
 
 	public double getBOvR() {
@@ -142,8 +143,12 @@ public class ClassInformation {
 	public void setBUR(int BUR) {
 		if(BUR != 0)bur = (double)(usedSuperFields.size()+usedSuperMethods.size())/BUR;
 	}
+
 	public ClassInformation getParent() {
 		return parentClass;
+	}
+	public List<ClassInformation> getChild(){
+		return childClass;
 	}
 	public void setParentClass(ClassInformation parent) {
 		this.parentClass = parent;
@@ -165,15 +170,46 @@ public class ClassInformation {
 		return isalist;
 	}
 
+	public double getNProtM() {
+		return nprotm;
+	}
+	public double getBOvR() {
+		return bovr;
+	}
+	public double getNAS() {
+		return nas;
+	}
+	public double getPNAS() {
+		return pnas;
+	}
+	public double getBUR() {
+		return bur;
+	}
+	public double getNOM() {
+		return nom;
+	}
+	public double getWMC() {
+		return wmc;
+	}
+	public double getAMW() {
+		return amw;
+	}
+	public String getName() {
+		return className;
+	}
+	
+
 	public boolean isRPB() {
-		return ((nprotm > 3 && bur < (double)1/3) || bovr < (double)1/3)
+		if(parentClass != null) return ((nprotm > 3 && bur < (double)1/3) || bovr < (double)1/3)
 				&& ((amw > 2.0 || wmc > 14) && nom > 7);
+		else return false;
 	}
 
 	public boolean isTB() {
-		return (nas >= 7 && pnas < (double)2/3)
+		if(parentClass != null) return (nas >= 7 && pnas < (double)2/3)
 		&& ((amw > 2.0 || wmc >= 47) && nom >= 10)
-		&& (amw > 2.0 && nom > 5 && wmc >= 14);
+		&& (parentClass.getAMW() > 2.0 && parentClass.getNOM() > 5 && parentClass.getWMC() >= 14);
+		else return false;
 	}
 	public void addChildClass(ClassInformation child) {
 		childClass.add(child);

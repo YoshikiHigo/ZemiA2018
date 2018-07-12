@@ -44,6 +44,8 @@ public class ZemiAVisitor extends ASTVisitor {
 			new HashMap<MethodInvocation,MethodDeclaration>();  //method invocation is unique
 	private Stack<MethodDeclaration> methodDeclarationStack = new Stack<MethodDeclaration>();
 
+	private List<ClassInformation> hierarchyTop = new ArrayList<ClassInformation>();
+
 	private List<IVariableBinding> usedSuperFields;
 	private List<IMethodBinding> usedSuperMethods;
 	private int NOM = 0;
@@ -96,11 +98,12 @@ public class ZemiAVisitor extends ASTVisitor {
 					}
 				}
 				Data.setInheritanceInformation(ovnum, povnum);
+			}else {
+				hierarchyTop.add(pData);
 			}
 		}
 
-
-
+    
 		// Print Class Informations
 		System.out.println("print class informations: ");
 		for(ClassInformation classInformation: allDeclaratedClasses) {
@@ -209,7 +212,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	public boolean visit(MethodDeclaration node) {
 		// to access from MethodInvocation to MethodDeclaration
 		methodDeclarationStack.push(node);
-
+    
 		NOM++;
 		if((Modifier.PUBLIC & node.getModifiers()) != 0) {
 			pmlist.add(node);
@@ -331,6 +334,14 @@ public class ZemiAVisitor extends ASTVisitor {
 			}
 		}
 		return shotgunSurgeryMethods;
+	}
+	
+	public List<ClassInformation> getClassInformation(){
+		return allDeclaratedClasses;
+	}
+	
+	public List<ClassInformation> getHierarchyTop(){
+		return hierarchyTop;
 	}
 
 }
