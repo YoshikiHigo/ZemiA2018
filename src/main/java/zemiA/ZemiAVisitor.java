@@ -44,6 +44,8 @@ public class ZemiAVisitor extends ASTVisitor {
 			new HashMap<MethodInvocation,MethodDeclaration>();  //method invocation is unique
 	private Stack<MethodDeclaration> methodDeclarationStack = new Stack<MethodDeclaration>();
 
+	private List<ClassInformation> hierarchyTop = new ArrayList<ClassInformation>();
+
 	private List<IVariableBinding> usedSuperFields;
 	private List<IMethodBinding> usedSuperMethods;
 	private int NOM = 0;
@@ -64,6 +66,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	public void endVisit(CompilationUnit node) {
 		// Judgement over Project by List
 
+		//chapter 6
 		for(MethodInvocation invokedMethod: allInvokedMethods) {
 			IMethodBinding invokedMethodBind = invokedMethod.resolveMethodBinding();
 			IMethodBinding invokingMethodBind = allInvokingMethods.get(invokedMethod).resolveBinding();
@@ -75,9 +78,7 @@ public class ZemiAVisitor extends ASTVisitor {
 			}
 		}
 
-
-
-
+		//chapter 7
 		for(ClassInformation Data : allDeclaratedClasses) {
 			ClassInformation pData = getClassInformation(Data.getParentBindig());
 			if(pData != null) {
@@ -97,33 +98,31 @@ public class ZemiAVisitor extends ASTVisitor {
 					}
 				}
 				Data.setInheritanceInformation(ovnum, povnum);
+			}else {
+				hierarchyTop.add(pData);
 			}
 		}
 
-
-
-
-
-
-
-
+    
 		// Print Class Informations
 		System.out.println("print class informations: ");
 		for(ClassInformation classInformation: allDeclaratedClasses) {
-			classInformation.printClassInformation(ClassInformation.FOR_DISPLAY);
+			classInformation.printClassInformation(allDeclaratedMethods);
 
 		}
 
 		// Print Project Information
-		System.out.println("print project informations: ");
+		//System.out.println("print project informations: ");
 //		for(MethodInformation m: getShotgunSurgeryMethodList()) {
 //			System.out.println(m.getMethodBinding().getName().toString()); //TODO why this line comment out cause bag?
 //			m.printMethodInfomation(MethodInformation.FOR_DISPLAY);
 //		}
-		for(MethodInformation m: allDeclaratedMethods) {
-			//System.out.println(m.getMethodBinding().getName().toString()); //TODO why this line comment out cause bag?
-			m.printMethodInfomation(MethodInformation.FOR_REFACTORING);
-		}
+
+//		for(MethodInformation m: allDeclaratedMethods) {
+//			//System.out.println(m.getMethodBinding().getName().toString()); //TODO why this line comment out cause bag?
+//			m.printMethodInfomation();
+//		}
+
 		System.out.println();
 
 		super.endVisit(node);
@@ -213,7 +212,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	public boolean visit(MethodDeclaration node) {
 		// to access from MethodInvocation to MethodDeclaration
 		methodDeclarationStack.push(node);
-
+    
 		NOM++;
 		if((Modifier.PUBLIC & node.getModifiers()) != 0) {
 			pmlist.add(node);
@@ -335,6 +334,14 @@ public class ZemiAVisitor extends ASTVisitor {
 			}
 		}
 		return shotgunSurgeryMethods;
+	}
+	
+	public List<ClassInformation> getClassInformation(){
+		return allDeclaratedClasses;
+	}
+	
+	public List<ClassInformation> getHierarchyTop(){
+		return hierarchyTop;
 	}
 
 }

@@ -36,40 +36,33 @@ public class ClassInformation {
 	private List<IMethodBinding> usedSuperMethods;
 
 
-
-	public static final int FOR_DISPLAY = 0;
-	public static final int FOR_REFACTORING = 1;
-
 	public ClassInformation(ITypeBinding typeBinding) {
 		classBind = typeBinding;
 		className = classBind.getName().toString();
-
 	}
 
 	public ITypeBinding getClassBinding() {
 		return classBind;
 	}
 
-	public void setMethodList(List<IMethodBinding> methods) {
-		classMethods = methods;
-		for(IMethodBinding classMethod: classMethods) {
-			classMethodsInformation.add(MethodInformation.getMethodInformation(classMethod, classMethodsInformation));
-		}
-	}
+	//legacy
+//	public void setMethodList(List<IMethodBinding> methods) {
+//		classMethods = methods;
+//	}
 
 	public List<IMethodBinding> getMethodsList(){
 		return classMethods;
 	}
 
-
-	public boolean setMaxNesting(int nesting) {
-		if(nesting<0) {
-			return false;
-		}else {
-			maxNesting = nesting;
-			return true;
-		}
-	}
+	//legacy
+//	public boolean setMaxNesting(int nesting) {
+//		if(nesting<0) {
+//			return false;
+//		}else {
+//			maxNesting = nesting;
+//			return true;
+//		}
+//	}
 
 	public int getMaxNesting() {
 		//maxNesting include method definition block
@@ -77,75 +70,57 @@ public class ClassInformation {
 	}
 
 
-	public void printClassInformation(int mode) {
-		if(mode == FOR_DISPLAY || mode == FOR_REFACTORING) {
-			System.out.println("Class name: "+ className);
-			if(parentName != null)System.out.println("Parent Class name: "+parentName);
-			System.out.println("NOM: "+nom);
-			System.out.println("WMC: "+wmc);
-			System.out.println("AMW: "+amw);
-			System.out.println("NProtM: "+nprotm);
-			if(bovr!=-1)System.out.println("BOvR: "+ bovr);
-			else System.out.println("BOvR: parent class is made by third party");
-			if(nas!=-1)System.out.println("NAS: "+nas);
-			else System.out.println("NAS: parent class is made by third party");
-			if(pnas!=-1)System.out.println("PNAS:" +pnas);
-			else System.out.println("PNAS: parent class is made by third party");
-			if(bur!=-1)System.out.println("BUR: "+bur);
-			else System.out.println("BUR: parent class is made by third party");
-			System.out.println("Refused Parent Bequest: "+this.isRPB());
-			System.out.println("Tradition Breaker: "+this.isTB());
+	public void printClassInformation(List<MethodInformation> allDeclaratedMethods) {
+		System.out.println("Class name: "+ className);
+		if(parentName != null)System.out.println("Parent Class name: "+parentName);
+		System.out.println("NOM: "+nom);
+		System.out.println("WMC: "+wmc);
+		System.out.println("AMW: "+amw);
+		System.out.println("NProtM: "+nprotm);
+		if(bovr!=-1)System.out.println("BOvR: "+ bovr);
+		else System.out.println("BOvR: parent class is made by third party");
+		if(nas!=-1)System.out.println("NAS: "+nas);
+		else System.out.println("NAS: parent class is made by third party");
+		if(pnas!=-1)System.out.println("PNAS:" +pnas);
+		else System.out.println("PNAS: parent class is made by third party");
+		if(bur!=-1)System.out.println("BUR: "+bur);
+		else System.out.println("BUR: parent class is made by third party");
+		System.out.println("Refused Parent Bequest: "+this.isRPB());
+		System.out.println("Tradition Breaker: "+this.isTB());
+
+		for(IMethodBinding classMethod: classMethods) {
+			classMethodsInformation.add(MethodInformation.getMethodInformation(classMethod, allDeclaratedMethods));
 		}
-
-		if(mode == FOR_REFACTORING) {
-			// for refactoring
-			System.out.println("----- print information for refactoring -----");
-
+		System.out.println("------------this class's method information------------");
+		for(MethodInformation classMethod: classMethodsInformation) {
+			classMethod.printMethodInfomation();
 		}
 
 		System.out.println();
 	}
 
-
+  
 	public static ClassInformation getClassInformation(ITypeBinding classBind, List<ClassInformation> classes) {
 		for(ClassInformation classInformation: classes) {
 			if(classInformation.getClassBinding().equals(classBind)) {
 				return classInformation;
 			}
 		}
+		// if the class is not project class
 		return null;
 	}
 	public ITypeBinding getParentBindig() {
 		return parentBinding;
 	}
-
-
-	public double getBOvR() {
-		return bovr;
-	}
-	public void setBOvR(double BOvR) {
-		if(nom != 0) bovr = BOvR/nom;
-	}
-	public int getNAS() {
-		return nas;
-	}
-	public void setNAS(int NAS) {
-		nas = pmlist.size() - NAS;
-	}
-	public double getPNAS() {
-		return pnas;
-	}
-	public void setPNAS() {
-		if(pmlist.size() != 0)pnas = (double)nas/pmlist.size();
-	}
-	public double getBUR() {
-		return bur;
-	}
 	public void setBUR(int BUR) {
 		if(BUR != 0)bur = (double)(usedSuperFields.size()+usedSuperMethods.size())/BUR;
 	}
+
 	public ClassInformation getParent() {
 		return parentClass;
+	}
+	public List<ClassInformation> getChild(){
+		return childClass;
 	}
 	public void setParentClass(ClassInformation parent) {
 		this.parentClass = parent;
@@ -167,15 +142,49 @@ public class ClassInformation {
 		return isalist;
 	}
 
+	public double getNProtM() {
+		return nprotm;
+	}
+	public double getBOvR() {
+		return bovr;
+	}
+	public double getNAS() {
+		return nas;
+	}
+	public double getPNAS() {
+		return pnas;
+	}
+	public double getBUR() {
+		return bur;
+	}
+	public double getNOM() {
+		return nom;
+	}
+	public double getWMC() {
+		return wmc;
+	}
+	public double getAMW() {
+		return amw;
+	}
+	public String getName() {
+		return className;
+	}
+	public List<MethodInformation> getMethodInformation(){
+		return classMethodsInformation;
+	}
+	
+
 	public boolean isRPB() {
-		return ((nprotm > 3 && bur < (double)1/3) || bovr < (double)1/3)
+		if(parentClass != null) return ((parentClass.getNProtM() > 3 && bur < (double)1/3) || bovr < (double)1/3)
 				&& ((amw > 2.0 || wmc > 14) && nom > 7);
+		else return false;
 	}
 
 	public boolean isTB() {
-		return (nas >= 7 && pnas < (double)2/3)
+		if(parentClass != null) return (nas >= 7 && pnas < (double)2/3)
 		&& ((amw > 2.0 || wmc >= 47) && nom >= 10)
-		&& (amw > 2.0 && nom > 5 && wmc >= 14);
+		&& (parentClass.getAMW() > 2.0 && parentClass.getNOM() > 5 && parentClass.getWMC() >= 14);
+		else return false;
 	}
 	public void addChildClass(ClassInformation child) {
 		childClass.add(child);

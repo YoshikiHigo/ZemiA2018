@@ -1,19 +1,19 @@
 package zemiA;
+import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.util.List;
 
 import javax.swing.JPanel;
 
-public class BoardView  extends JPanel implements BoardListener,MouseListener,MouseMotionListener{
+public class BoardView  extends JPanel {
 
-  private BoardModel BM;
+  List<ClassInformation> CIS;
   private String nameEvent;
   private int pointX=0;
   private int pointY=0;
 
-  public BoardView(BoardModel BM){
-    this.BM=BM;
+  public BoardView(List<ClassInformation> CIS){
+	  this.CIS=CIS;
     //this.addMouseListener(this);
     //this.addMouseMotionListener(this);
   }
@@ -67,18 +67,27 @@ public class BoardView  extends JPanel implements BoardListener,MouseListener,Mo
     @Override
     public void paint(Graphics g) {
 
+
     super.paint(g);
     int xMargin=calcPrefferedPlace()[0];
     int yMargin=calcPrefferedPlace()[1];
     int lengthCell=calcPrefferedPlace()[2];
 
-    for(int c=0;c<=BM.getCols();c++) g.drawLine(xMargin+lengthCell*c,yMargin,xMargin+lengthCell*c,yMargin+lengthCell*BM.getRows());
-    for(int r=0;r<=BM.getRows();r++) g.drawLine(xMargin,yMargin+lengthCell*r,xMargin+lengthCell*BM.getCols(),yMargin+lengthCell*r);
+    Font font1=new Font("ＭＳ　Ｐゴシック",Font.PLAIN,20);
+    g.setFont(font1);
 
-    for(int c=1;c<=BM.getCols();c++)
-      for(int r=1;r<=BM.getRows();r++)
+
+    for(int c=0;c<=1;c++)
+    	for(int r=0;r<=CIS.size();r++) {
+    	   g.drawLine(xMargin+lengthCell*c,yMargin,xMargin+lengthCell*c,yMargin+lengthCell*CIS.size());
+           g.drawLine(xMargin,yMargin+lengthCell*r,xMargin+lengthCell*1,yMargin+lengthCell*r);
+
+           if(0<r)g.drawString(CIS.get(r-1).getName(), (int)(xMargin+1.2*lengthCell), (int)(yMargin+lengthCell*r-lengthCell/2.8));
+    	}
+    for(int c=1;c<=1;c++)
+      for(int r=1;r<=CIS.size();r++)
        //if(そのクラスが不調和を持っていれば)
-      if(false)g.fillRect(xMargin+(c-1)*lengthCell+1,yMargin+(r-1)*lengthCell+1,lengthCell,lengthCell);
+      if(CIS.get(r-1).isRPB()|CIS.get(r-1).isTB())g.fillRect(xMargin+(c-1)*lengthCell+1,yMargin+(r-1)*lengthCell+1,lengthCell,lengthCell);
   }
   //各マスの下に名前を表示する。
   //マスの間には間隔を開ける
@@ -90,13 +99,13 @@ public class BoardView  extends JPanel implements BoardListener,MouseListener,Mo
     int width=this.getWidth();
 
     float windowRatio=(float)height/(float)width;
-    float boardRatio=(float)BM.getRows()/(float)BM.getCols();
+    float boardRatio=(float)CIS.size()/(float)1;
     int lengthCell;
-    if(windowRatio>boardRatio)lengthCell=this.getWidth()/BM.getCols();
-    else lengthCell=this.getHeight()/BM.getRows();
+    if(windowRatio>boardRatio)lengthCell=this.getWidth()/1;
+    else lengthCell=this.getHeight()/CIS.size();
 
-    int xMargin=windowRatio>boardRatio?0:(width-(BM.getCols()*lengthCell))/2;
-    int yMargin=windowRatio>boardRatio?(height-(BM.getRows()*lengthCell))/2:0;
+    int xMargin=windowRatio>boardRatio?0:10;//(width-(1*lengthCell))/2;
+    int yMargin=windowRatio>boardRatio?(height-(CIS.size()*lengthCell))/2:5;
 
     return new int[] {xMargin,yMargin,lengthCell};
   }

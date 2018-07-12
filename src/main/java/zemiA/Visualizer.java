@@ -1,15 +1,17 @@
 package zemiA;
 
+import java.util.List;
+
 public class  Visualizer implements Runnable{
 
-	int NOC;
+	List<ClassInformation> CIS;
 
-	public void visualize(int NOC) {
-      NOC=this.NOC;
+	public void visualize(List<ClassInformation> CIS) {
+      this.CIS=CIS;
 		run();
 	}
 
   public void run() {
-    new MainWindow(4,1);
+    new MainWindow(CIS);
   }
 }

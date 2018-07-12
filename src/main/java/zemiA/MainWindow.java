@@ -1,12 +1,13 @@
 package zemiA;
 
 import java.awt.BorderLayout;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class MainWindow {
-  public MainWindow(int columns,int rows) {
+  public MainWindow(List<ClassInformation> CIS) {
     JFrame frame=new JFrame();
     frame.setTitle("Lifegame");
     frame.setLocationRelativeTo(null);
@@ -30,9 +31,9 @@ public class MainWindow {
     frame.setContentPane(base);
     base.setLayout(new BorderLayout());
 
-    BoardModel BM =new BoardModel(columns,rows);
-    BoardView view =new BoardView(BM);
-    base.add(view,BorderLayout.CENTER);
+
+    BoardView view =new BoardView(CIS);
+    frame.add(view,BorderLayout.CENTER);
     /*
     BM.addListener(view);
     boardSize.addActionListener(new ChangeBoardSizeListener(BM));
@@ -59,3 +60,4 @@ public class MainWindow {
     frame.setVisible(true);
     }
 }
+
