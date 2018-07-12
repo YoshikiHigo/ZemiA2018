@@ -19,7 +19,7 @@ public class OutExcel {
     int i = 0;
 
     for(ClassInformation Data : allDeclaratedClasses) {
-    	
+
     	Sheet sheet = book.createSheet(Data.getName());
 	    i = 0;
 	    Row row = sheet.createRow(i++);
@@ -27,75 +27,75 @@ public class OutExcel {
 	    Cell b = row.createCell(1);
 	    a.setCellValue("Class name");
 	    b.setCellValue(Data.getName());
-	    
+
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
-	    a.setCellValue("Parent Class name"); 
+	    a.setCellValue("Parent Class name");
 	    b.setCellValue(Data.getParentBindig().getBinaryName());
-	    
+
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
 	    a.setCellValue("NOM");
 	    b.setCellValue(Data.getNOM());
-	    
+
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
-	    a.setCellValue("WMC"); 
+	    a.setCellValue("WMC");
 	    b.setCellValue(Data.getWMC());
-	    
+
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
-	    a.setCellValue("AMW"); 
+	    a.setCellValue("AMW");
 	    b.setCellValue(Data.getAMW());
-	    
+
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
-	    a.setCellValue("NProtM"); 
+	    a.setCellValue("NProtM");
 	    b.setCellValue(Data.getNProtM());
-	    
+
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
-	    a.setCellValue("BOvR"); 
+	    a.setCellValue("BOvR");
 	    b.setCellValue(Data.getBOvR());
-	    
+
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
-	    a.setCellValue("NAS"); 
+	    a.setCellValue("NAS");
 	    b.setCellValue(Data.getNAS());
-	    
+
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
-	    a.setCellValue("PNAS"); 
+	    a.setCellValue("PNAS");
 	    b.setCellValue(Data.getPNAS());
-	    
+
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
-	    a.setCellValue("BUR"); 
+	    a.setCellValue("BUR");
 	    b.setCellValue(Data.getBUR());
-	    
+
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
-	    a.setCellValue("Refused Parent Bequest"); 
+	    a.setCellValue("Refused Parent Bequest");
 	    b.setCellValue(Data.isRPB());
-	    
+
 	    row = sheet.createRow(i++);
 	    a = row.createCell(0);
 	    b = row.createCell(1);
-	    a.setCellValue("Tradition Breaker"); 
+	    a.setCellValue("Tradition Breaker");
 	    b.setCellValue(Data.isTB());
-	    
+
     }
-    
+
     // ここから出力処理
     FileOutputStream out = null;
     try {
@@ -103,7 +103,7 @@ public class OutExcel {
 	out = new FileOutputStream("ZemiAData.xlsx");
 	// 上記で作成したブックを出力先に書き込み
 	book.write(out);
-    
+
     } catch (FileNotFoundException e) {
 	System.out.println(e.getStackTrace());
 
@@ -112,6 +112,6 @@ public class OutExcel {
 	out.close();
 	book.close();
     }
-	  
+
   }
 }
