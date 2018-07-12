@@ -179,7 +179,7 @@ public class ClassInformation {
 	
 
 	public boolean isRPB() {
-		if(parentClass != null) return ((nprotm > 3 && bur < (double)1/3) || bovr < (double)1/3)
+		if(parentClass != null) return ((parentClass.getNProtM() > 3 && bur < (double)1/3) || bovr < (double)1/3)
 				&& ((amw > 2.0 || wmc > 14) && nom > 7);
 		else return false;
 	}

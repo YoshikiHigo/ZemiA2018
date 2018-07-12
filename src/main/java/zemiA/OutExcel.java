@@ -22,6 +22,9 @@ public class OutExcel {
     	
     	Sheet sheet = book.createSheet(Data.getName());
 	    i = 0;
+	    sheet.setColumnWidth(0, 8192);
+	    sheet.setColumnWidth(1, 8192);
+	    
 	    Row row = sheet.createRow(i++);
 	    Cell a = row.createCell(0);  // Excel上、「A1」の場所
 	    Cell b = row.createCell(1);
