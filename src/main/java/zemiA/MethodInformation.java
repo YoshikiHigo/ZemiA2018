@@ -47,6 +47,9 @@ public class MethodInformation{
 		return cint;
 	}
 
+	public String getName() {
+		return methodName + getMethodArguments();
+	}
 	public double getCDISP() {
 		HashMap<ITypeBinding,Integer> invokedClasses = new HashMap<ITypeBinding,Integer>();
 		for(IMethodBinding invokedMethod: invokedMethods) {
@@ -104,16 +107,19 @@ public class MethodInformation{
 		return methodBind;
 	}
 
-	public void printMethodInfomation(){
-		ITypeBinding[] argumentsBind = methodBind.getTypeArguments();
+	public String getMethodArguments() {
+		ITypeBinding[] argumentsBind = methodBind.getParameterTypes();
 		List<String> argumentsString = new ArrayList<String>();
 		for(ITypeBinding argument: argumentsBind) {
 			argumentsString.add(argument.getName().toString());
 		}
-		String arguments = "(" + String.join(", ", argumentsString) + ")";
+		return  "(" + String.join(", ", argumentsString) + ")";
+	}
+
+	public void printMethodInfomation(){
 
 		// TODO 引数のリストが常に空(APIになんか書いてるけどジェネリックメソッドってなんですか)
-		System.out.println("methodName: " + methodName + arguments);
+		System.out.println("methodName: " + methodName + getMethodArguments());
 		System.out.println("declarated class: " + methodBind.getDeclaringClass().getBinaryName().toString());
 		System.out.println("CINT: " + getCINT());
 		System.out.println("CDISP: " + getCDISP());

@@ -41,7 +41,6 @@ public class ClassInformation {
 		className = classBind.getName().toString();
 	}
 
-
 	public ITypeBinding getClassBinding() {
 		return classBind;
 	}
@@ -114,7 +113,6 @@ public class ClassInformation {
 		return parentBinding;
 	}
 
-
 	public void setBUR(int BUR) {
 		if(BUR != 0)bur = (double)(usedSuperFields.size()+usedSuperMethods.size())/BUR;
 	}
@@ -173,9 +171,12 @@ public class ClassInformation {
 		return className;
 	}
 
+	public List<MethodInformation> getMethodInformation(){
+		return classMethodsInformation;
+	}
 
 	public boolean isRPB() {
-		if(parentClass != null) return ((nprotm > 3 && bur < (double)1/3) || bovr < (double)1/3)
+		if(parentClass != null) return ((parentClass.getNProtM() > 3 && bur < (double)1/3) || bovr < (double)1/3)
 				&& ((amw > 2.0 || wmc > 14) && nom > 7);
 		else return false;
 	}

@@ -103,25 +103,13 @@ public class ZemiAVisitor extends ASTVisitor {
 			}
 		}
 
-    
+
 		// Print Class Informations
 		System.out.println("print class informations: ");
 		for(ClassInformation classInformation: allDeclaratedClasses) {
 			classInformation.printClassInformation(allDeclaratedMethods);
 
 		}
-
-		// Print Project Information
-		//System.out.println("print project informations: ");
-//		for(MethodInformation m: getShotgunSurgeryMethodList()) {
-//			System.out.println(m.getMethodBinding().getName().toString()); //TODO why this line comment out cause bag?
-//			m.printMethodInfomation(MethodInformation.FOR_DISPLAY);
-//		}
-
-//		for(MethodInformation m: allDeclaratedMethods) {
-//			//System.out.println(m.getMethodBinding().getName().toString()); //TODO why this line comment out cause bag?
-//			m.printMethodInfomation();
-//		}
 
 		System.out.println();
 
@@ -212,7 +200,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	public boolean visit(MethodDeclaration node) {
 		// to access from MethodInvocation to MethodDeclaration
 		methodDeclarationStack.push(node);
-    
+
 		NOM++;
 		if((Modifier.PUBLIC & node.getModifiers()) != 0) {
 			pmlist.add(node);
@@ -335,11 +323,11 @@ public class ZemiAVisitor extends ASTVisitor {
 		}
 		return shotgunSurgeryMethods;
 	}
-	
+
 	public List<ClassInformation> getClassInformation(){
 		return allDeclaratedClasses;
 	}
-	
+
 	public List<ClassInformation> getHierarchyTop(){
 		return hierarchyTop;
 	}
