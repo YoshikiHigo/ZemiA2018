@@ -47,6 +47,9 @@ public class MethodInformation{
 		return cint;
 	}
 
+	public String getName() {
+		return methodName;
+	}
 	public double getCDISP() {
 		HashMap<ITypeBinding,Integer> invokedClasses = new HashMap<ITypeBinding,Integer>();
 		for(IMethodBinding invokedMethod: invokedMethods) {

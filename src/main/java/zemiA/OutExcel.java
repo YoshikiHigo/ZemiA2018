@@ -94,6 +94,67 @@ public class OutExcel {
 	    a.setCellValue("Tradition Breaker"); 
 	    b.setCellValue(Data.isTB());
 	    
+	    for(MethodInformation mData : Data.getMethodInformation()) {
+	    	i++;
+	    	
+		    row = sheet.createRow(i++);
+		    a = row.createCell(0);
+		    b = row.createCell(1);
+		    a.setCellValue("methodName"); 
+		    b.setCellValue(mData.getName());
+		    
+		    row = sheet.createRow(i++);
+		    a = row.createCell(0);
+		    b = row.createCell(1);
+		    a.setCellValue("CINT"); 
+		    b.setCellValue(mData.getCINT());
+		    
+		    row = sheet.createRow(i++);
+		    a = row.createCell(0);
+		    b = row.createCell(1);
+		    a.setCellValue("CDISP"); 
+		    b.setCellValue(mData.getCDISP());
+		    
+		    row = sheet.createRow(i++);
+		    a = row.createCell(0);
+		    b = row.createCell(1);
+		    a.setCellValue("MAXNESTING"); 
+		    b.setCellValue(mData.getMaxNesting());
+		    
+		    row = sheet.createRow(i++);
+		    a = row.createCell(0);
+		    b = row.createCell(1);
+		    a.setCellValue("CM"); 
+		    b.setCellValue(mData.getCM());
+		    
+		    row = sheet.createRow(i++);
+		    a = row.createCell(0);
+		    b = row.createCell(1);
+		    a.setCellValue("CC"); 
+		    b.setCellValue(mData.getCC());
+		    
+		    row = sheet.createRow(i++);
+		    a = row.createCell(0);
+		    b = row.createCell(1);
+		    a.setCellValue("intensive coupling"); 
+		    b.setCellValue(mData.isIntensiveCoupling());
+		    
+		    row = sheet.createRow(i++);
+		    a = row.createCell(0);
+		    b = row.createCell(1);
+		    a.setCellValue("dispersed coupling"); 
+		    b.setCellValue(mData.isDispersedCoupling());
+		    
+		    row = sheet.createRow(i++);
+		    a = row.createCell(0);
+		    b = row.createCell(1);
+		    a.setCellValue("shotgun surgery"); 
+		    b.setCellValue(mData.isShotgunSurgery());
+	    	
+	    	
+	    }
+	    
+	    
     }
     
     // ここから出力処理
