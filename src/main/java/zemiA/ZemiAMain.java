@@ -96,6 +96,8 @@ public class ZemiAMain {
 
 			        Visualizer Vi=new Visualizer();
 			        Vi.visualize(visitor.getClassInformation());
+
+			        new OutExcel(visitor.getClassInformation());
 				}
 		    }
 

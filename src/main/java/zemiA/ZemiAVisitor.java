@@ -370,7 +370,7 @@ public class ZemiAVisitor extends ASTVisitor {
 		// set searched class information
 		//ClassInformation checkedClass = new ClassInformation(node.resolveBinding());
 		ClassInformation checkedClass = getClassInformation(node.resolveBinding());
-		allDeclaratedClasses.add(checkedClass);
+		//allDeclaratedClasses.add(checkedClass);
 
 		checkedClass.setClassInformation(classMethods ,classMaxNesting , NOM, WMC, NProtM,
 				pmlist, ismlist, alist, isalist, usedSuperFields, usedSuperMethods);
