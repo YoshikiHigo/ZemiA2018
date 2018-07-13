@@ -35,9 +35,9 @@ public class ZemiAMain {
 		}
 
 		try {
-			//File dir = Select.FileSelect();
+			File dir = Select.FileSelect();
 			//List<File> files = Select.extractFiles(dir, 0);
-			File dir = new File("src/main/java/zemiA/");
+			//File dir = new File("src/main/java/zemiA/");
 			String text=null;
 			String input = null;
 			File inputFile = null;
