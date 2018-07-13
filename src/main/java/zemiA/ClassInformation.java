@@ -34,11 +34,24 @@ public class ClassInformation {
 	private List<FieldDeclaration> isalist;//public or protected field list
 	private List<IVariableBinding> usedSuperFields;
 	private List<IMethodBinding> usedSuperMethods;
+  
+  private int classWOC = 0;
+	private int classLOC = 0;
+
+	private int noam=0;//the Number of Acceccor Methods
+	private int nopa=0;//the Number Of Public Attributes
+	private int classatfd=0;
+	private double tcc=0;
+	private List<IMethodBinding> invokingmethod = new ArrayList<IMethodBinding>();
+	private List<String> declaringfieldlist = new ArrayList<String>();
+
+//	public int dummy;//NOPA test
 
 
 	public ClassInformation(ITypeBinding typeBinding) {
 		classBind = typeBinding;
 		className = classBind.getName().toString();
+
 	}
 
 	public ITypeBinding getClassBinding() {
@@ -53,6 +66,7 @@ public class ClassInformation {
 	public List<IMethodBinding> getMethodsList(){
 		return classMethods;
 	}
+
 
 	//legacy
 //	public boolean setMaxNesting(int nesting) {
@@ -69,6 +83,79 @@ public class ClassInformation {
 		return maxNesting;
 	}
 
+	public void setClassWOC(int woc) {
+		classWOC = woc;
+	}
+
+	public int getClassWOC() {
+		return classWOC;
+	}
+
+	public void setClassLOC(int loc) {
+		classLOC = loc;
+	}
+
+	public int getClassLOC() {
+		return classLOC;
+	}
+
+	
+
+	public void setNOAM(int n) {
+		noam = n;
+	}
+
+	public int getNOAM() {
+		return noam;
+	}
+
+	public void setNOPA(int argnopa) {
+		this.nopa = argnopa;
+	}
+
+	public int getNOPA() {
+		return this.nopa;
+	}
+
+	public void setClassATFD(int argclassatfd) {
+		this.classatfd = argclassatfd;
+	}
+
+	public int getClassATFD() {
+		return this.classatfd;
+	}
+
+	public void setInvokingMethods(IMethodBinding mb) {
+		this.invokingmethod.add(mb);
+	}
+
+	public List<IMethodBinding> getInvokingMethods() {
+		return this.invokingmethod;
+	}
+
+	public void setDeclaringFieldList(String s) {
+		this.declaringfieldlist.add(s);
+	}
+
+	public List<String> getDeclaringFieldList() {
+		return this.declaringfieldlist;
+	}
+
+	public boolean isDefined(IMethodBinding mb) {
+		return this.classMethods.contains(mb);
+	}
+
+	public boolean isDefined(String fieldname) {
+		return this.declaringfieldlist.contains(fieldname);
+	}
+
+	public void setTCC(double argtcc) {
+		this.tcc = argtcc;
+	}
+
+	public double getTCC() {
+		return this.tcc;
+	}
 
 	public void printClassInformation(List<MethodInformation> allDeclaratedMethods) {
 		System.out.println("Class name: "+ className);
