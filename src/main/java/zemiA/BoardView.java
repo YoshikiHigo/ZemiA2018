@@ -71,28 +71,61 @@ public class BoardView  extends JPanel {
     super.paint(g);
     int xMargin=calcPrefferedPlace()[0];
     int yMargin=calcPrefferedPlace()[1];
-    int lengthCell=calcPrefferedPlace()[2];
-
-    Font font1=new Font("ＭＳ　Ｐゴシック",Font.PLAIN,20);
-    g.setFont(font1);
+    int length=calcPrefferedPlace()[2];
 
 
-    for(int c=0;c<=1;c++)
-    	for(int r=0;r<=CIS.size();r++) {
-    	   g.drawLine(xMargin+lengthCell*c,yMargin,xMargin+lengthCell*c,yMargin+lengthCell*CIS.size());
-           g.drawLine(xMargin,yMargin+lengthCell*r,xMargin+lengthCell*1,yMargin+lengthCell*r);
+    int height=this.getHeight();
+    int width=this.getWidth();
 
-           if(0<r)g.drawString(CIS.get(r-1).getName(), (int)(xMargin+1.2*lengthCell), (int)(yMargin+lengthCell*r-lengthCell/2.8));
+    int number=0;
+    //セルの単位長さを求める
+   for(int i=0;i<CIS.size();i++) {
+     if(CIS.get(i).getMethodsList().size()>10)number+=3;
+     else if(CIS.get(i).getMethodsList().size()>5)number+=2;
+     else number+=1;
+   }
+   length=height/number;
+
+    int sumOflengthCell=0;
+    for(int c=0;c<1;c++)
+    	for(int r=0;r<CIS.size();r++) {
+    	    int howManyMethods=0;
+    		if(CIS.get(r).getMethodsList().size()>10)howManyMethods=3;
+    		else if(CIS.get(r).getMethodsList().size()>5)howManyMethods=2;
+    		else howManyMethods=1;
+
+    		int lengthCell=length;
+    		xMargin=calcPrefferedPlace()[0];
+    		//ウィンドウサイズに合わせてlengthCellを決定
+    		if(howManyMethods==1) {
+    			lengthCell=length*1;
+    			xMargin=xMargin+(int) (length*3-lengthCell)/2;
+    		}
+    		if(howManyMethods==2) {
+    			lengthCell=length*2;
+    			xMargin=xMargin+(int)(length*3-lengthCell)/2;
+    		}
+    	    if(howManyMethods==3) lengthCell=length*3;
+    		//マス左線
+			g.drawLine(xMargin,sumOflengthCell,xMargin,sumOflengthCell+lengthCell);
+    	   //マス右線
+    	   g.drawLine(xMargin+lengthCell,sumOflengthCell,xMargin+lengthCell,sumOflengthCell+lengthCell);
+    	   //マス上線
+           g.drawLine(xMargin,sumOflengthCell,xMargin+lengthCell,sumOflengthCell);
+           //マス下線
+           g.drawLine(xMargin,sumOflengthCell+lengthCell,xMargin+lengthCell,sumOflengthCell+lengthCell);
+           //クラス名ラベル
+           int fontSize=length;
+           if(howManyMethods==2)fontSize=(int)(length*1.5);
+           if(howManyMethods==3)fontSize=length*2;
+           Font font1=new Font("ＭＳ　Ｐゴシック",Font.PLAIN,(int)(fontSize));
+           g.setFont(font1);
+           g.drawString(CIS.get(r).getName(), (int)(10+length*3), (int)(sumOflengthCell+lengthCell/2+8));
+           if(CIS.get(r).isRPB()|CIS.get(r).isTB())g.fillRect(xMargin+(c)*lengthCell,yMargin+(r)*lengthCell+1,lengthCell,lengthCell);
+           sumOflengthCell+=lengthCell;
     	}
-    for(int c=1;c<=1;c++)
-      for(int r=1;r<=CIS.size();r++)
-       //if(そのクラスが不調和を持っていれば)
-      if(CIS.get(r-1).isRPB()|CIS.get(r-1).isTB())g.fillRect(xMargin+(c-1)*lengthCell+1,yMargin+(r-1)*lengthCell+1,lengthCell,lengthCell);
-  }
-  //各マスの下に名前を表示する。
-  //マスの間には間隔を開ける
-  //各マスはその不調和の数に比例して濃淡表示される。
-  //将来的にはそのブロックをクリックすることで不調和のコードを開く機能を追加できると良い的なこと言ってたらOK
+    }
+
 
   public int[] calcPrefferedPlace() {
     int height=this.getHeight();
@@ -102,11 +135,21 @@ public class BoardView  extends JPanel {
     float boardRatio=(float)CIS.size()/(float)1;
     int lengthCell;
     if(windowRatio>boardRatio)lengthCell=this.getWidth()/1;
-    else lengthCell=this.getHeight()/CIS.size();
+    else lengthCell=this.getHeight()/(CIS.size()+10);
 
-    int xMargin=windowRatio>boardRatio?0:10;//(width-(1*lengthCell))/2;
+    int xMargin=10;
     int yMargin=windowRatio>boardRatio?(height-(CIS.size()*lengthCell))/2:5;
 
     return new int[] {xMargin,yMargin,lengthCell};
   }
 }
+
+
+
+
+
+
+
+
+
+
