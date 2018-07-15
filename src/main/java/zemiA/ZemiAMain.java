@@ -20,10 +20,12 @@ import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 import org.eclipse.jface.text.Document;
 
 public class ZemiAMain {
+
 	private static List<String> sourceDirectories = new ArrayList<>();
 	private static List<String> classpathEntries = new ArrayList<>();
 
 	@SuppressWarnings("unchecked")
+
 	public static void main(final String[] args) throws IOException {
 
 		if (classpathEntries.isEmpty()) {
@@ -36,12 +38,14 @@ public class ZemiAMain {
 
 		try {
 			//File dir = Select.FileSelect();
+
 			//List<File> files = Select.extractFiles(dir, 0);
 			File dir = new File("src/main/java/zemiA/");
 			String text=null;
 			String input = null;
 			File inputFile = null;
 			if(dir != null) {
+
 				//for (File inf : files) {
 				for (File inf : dir.listFiles()) {
 					if(inf.getName().endsWith(".java")) {
@@ -85,12 +89,15 @@ public class ZemiAMain {
 					//final ASTRewrite rewriter = ASTRewrite.create(ast);
 					unit.recordModifications();
 
+
 					//final ZemiAVisitor visitor = new ZemiAVisitor();
 					final ZemiAVisitor visitor = new ZemiAVisitor();
 					unit.accept(visitor);
 
 			        Visualizer Vi=new Visualizer();
 			        Vi.visualize(visitor.getClassInformation());
+
+			        new OutExcel(visitor.getClassInformation());
 				}
 		    }
 
@@ -104,4 +111,6 @@ public class ZemiAMain {
 		return Files.lines(Paths.get(path), Charset.forName("UTF-8"))
 				.collect(Collectors.joining(System.getProperty("line.separator")));
 	}
+
 }
+
