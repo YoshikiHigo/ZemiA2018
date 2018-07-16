@@ -25,7 +25,8 @@ public class ZemiAMain {
 	private static List<String> classpathEntries = new ArrayList<>();
 
 	@SuppressWarnings("unchecked")
-	public static void main(final String[] args) {
+
+	public static void main(final String[] args) throws IOException {
 
 		if (classpathEntries.isEmpty()) {
 			final String systemLibraries = System.getProperty("java.class.path");
@@ -37,21 +38,27 @@ public class ZemiAMain {
 
 		try {
 			//File dir = Select.FileSelect();
+
+			//List<File> files = Select.extractFiles(dir, 0);
 			File dir = new File("src/main/java/zemiA/");
-			String text=null;
+			StringBuilder tmpText = null;
 			String input = null;
 			File inputFile = null;
 			if(dir != null) {
+
+				//for (File inf : files) {
 				for (File inf : dir.listFiles()) {
 					if(inf.getName().endsWith(".java")) {
-						if(text == null) {
+						if(tmpText == null) {
 							input = dir.toString();
 							inputFile = inf;
-							text=readAll(inf.getAbsolutePath());
+							tmpText = new StringBuilder(readAll(inf.getAbsolutePath()));
 						}
-						else text+=readAll(inf.getAbsolutePath());
+						// String no "+=" ha arienai
+						else tmpText.append(readAll(inf.getAbsolutePath()));
 					}
 				}
+				String text = tmpText.toString();
 				final Document document = new Document(text);
 
 
@@ -84,12 +91,18 @@ public class ZemiAMain {
 					//final ASTRewrite rewriter = ASTRewrite.create(ast);
 					unit.recordModifications();
 
+
+					//final ZemiAVisitor visitor = new ZemiAVisitor();
 					final ZemiAVisitor visitor = new ZemiAVisitor();
-					//final Ch7Visitor visitor = new Ch7Visitor();
 					unit.accept(visitor);
 
+			        Visualizer Vi=new Visualizer();
+			        Vi.visualize(visitor.getClassInformation());
+
+			        new OutExcel(visitor.getClassInformation());
 				}
-			}
+		    }
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -101,12 +114,5 @@ public class ZemiAMain {
 				.collect(Collectors.joining(System.getProperty("line.separator")));
 	}
 
-
-	public static int a() {
-		return 0;
-	}
 }
-
-
-
 
