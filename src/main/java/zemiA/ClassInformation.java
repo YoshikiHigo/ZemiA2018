@@ -164,7 +164,7 @@ public class ClassInformation {
 		}
 	}
 
-	public void printClassInformation(List<MethodInformation> allDeclaratedMethods) {
+	public void printClassInformation() {
 		System.out.println("Class name: "+ className);
 		if(parentName != null)System.out.println("Parent Class name: "+parentName);
 		System.out.println("NOM: "+nom);
