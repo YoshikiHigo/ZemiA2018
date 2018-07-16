@@ -1,15 +1,17 @@
 package zemiA;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
 public class MethodInformation{
 
-	private String methodName;
+	private String methodName;  //include arguments
 	private IMethodBinding methodBind;
 	private int cint = 0;	//the number of distinct method invocation
 	private double cdisp = 0;	//the number of class which define called method devided by CINT
@@ -19,7 +21,7 @@ public class MethodInformation{
 	private int cc = 0;
 	private List<IMethodBinding> invokingMethods = new ArrayList<IMethodBinding>();
 
-  private boolean accessor = false;
+	private boolean accessor = false;
 	private List<String> parameters = new ArrayList<String>();
 	private int methodatfddirect=0;
 	private int methodatfdvaimethod=0;
@@ -66,8 +68,18 @@ public class MethodInformation{
 	}
 
 	public String getName() {
-		return methodName;
+		ITypeBinding[] argumentsBind = methodBind.getParameterTypes();
+//		List<String> argumentsString = new ArrayList<String>();
+//		for(ITypeBinding argument: argumentsBind) {
+//			argumentsString.add(argument.getName().toString());
+//		}
+//		String arguments = "(" + String.join(", ", argumentsString) + ")";
+		String arguments = Arrays.asList(argumentsBind).stream()
+				.map(argument -> argument.getName().toString())
+				.collect(Collectors.joining(","));
+		return methodName + "(" + arguments + ")";
 	}
+
 	public double getCDISP() {
 		HashMap<ITypeBinding,Integer> invokedClasses = new HashMap<ITypeBinding,Integer>();
 		for(IMethodBinding invokedMethod: invokedMethods) {
@@ -98,9 +110,14 @@ public class MethodInformation{
 		return dispersedCoupling && deepNesting;
 	}
 
-  public void setMethodLOC(int loc) {
+	public void setMethodLOC(int loc) {
 		methodLOC = loc;
 	}
+
+	public int getMethodLOC() {
+		return methodLOC;
+	}
+
 
 	public void setAccessor(boolean b) {
 		this.accessor = b;
@@ -162,7 +179,7 @@ public class MethodInformation{
 		this.noav=this.accessedfeildlist.size()+this.accessednormalvariables.size()+this.parameters.size();
 	}
 
-  public int getNOAV() {
+	public int getNOAV() {
 		return this.noav;
 	}
 
@@ -197,7 +214,7 @@ public class MethodInformation{
 		return this.providerclasses;
 	}
 
-  public void setFDP() {
+	public void setFDP() {
 		this.fdp = this.providerclasses.size();
 	}
 
@@ -252,15 +269,7 @@ public class MethodInformation{
 
 
 	public void printMethodInfomation(){
-		ITypeBinding[] argumentsBind = methodBind.getTypeArguments();
-		List<String> argumentsString = new ArrayList<String>();
-		for(ITypeBinding argument: argumentsBind) {
-			argumentsString.add(argument.getName().toString());
-		}
-		String arguments = "(" + String.join(", ", argumentsString) + ")";
-
-		// TODO 引数のリストが常に空(APIになんか書いてるけどジェネリックメソッドってなんですか)
-		System.out.println("methodName: " + methodName + arguments);
+		System.out.println("methodName: " + getName());
 		System.out.println("declarated class: " + methodBind.getDeclaringClass().getBinaryName().toString());
 		System.out.println("CINT: " + getCINT());
 		System.out.println("CDISP: " + getCDISP());
@@ -281,5 +290,16 @@ public class MethodInformation{
 		}
 		// if the method is not project method
 		return null;
+	}
+
+	// TODO メソッドごとの不調和があったらここに追記してください
+	public int numOfDisharmony() {
+		int count = 0;
+
+		if(isIntensiveCoupling()) count++;
+		if(isDispersedCoupling()) count++;
+		if(isShotgunSurgery()) count++;
+
+		return count;
 	}
 }

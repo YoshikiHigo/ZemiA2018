@@ -41,7 +41,7 @@ public class ZemiAMain {
 
 			//List<File> files = Select.extractFiles(dir, 0);
 			File dir = new File("src/main/java/zemiA/");
-			String text=null;
+			StringBuilder tmpText = null;
 			String input = null;
 			File inputFile = null;
 			if(dir != null) {
@@ -49,14 +49,16 @@ public class ZemiAMain {
 				//for (File inf : files) {
 				for (File inf : dir.listFiles()) {
 					if(inf.getName().endsWith(".java")) {
-						if(text == null) {
+						if(tmpText == null) {
 							input = dir.toString();
 							inputFile = inf;
-							text=readAll(inf.getAbsolutePath());
+							tmpText = new StringBuilder(readAll(inf.getAbsolutePath()));
 						}
-						else text+=readAll(inf.getAbsolutePath());
+						// String no "+=" ha arienai
+						else tmpText.append(readAll(inf.getAbsolutePath()));
 					}
 				}
+				String text = tmpText.toString();
 				final Document document = new Document(text);
 
 

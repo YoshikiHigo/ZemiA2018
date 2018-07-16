@@ -91,7 +91,7 @@ public class ZemiAVisitor extends ASTVisitor {
 
 	@Override
 	public void endVisit(CompilationUnit node) {
-		// Judgement over Project by List
+		// Judgement over Project by Lists
 
 		//chapter 5
 		for (MethodInformation methodInformation : allDeclaratedMethods) {
@@ -261,26 +261,23 @@ public class ZemiAVisitor extends ASTVisitor {
 				hierarchyTop.add(pData);
 			}
 		}
-
-
-		// Print Class Informations
-		System.out.println("print class informations: ");
+		//end Judgement
+		
+		// Set Classes Information
 		for(ClassInformation classInformation: allDeclaratedClasses) {
-			classInformation.printClassInformation(allDeclaratedMethods);
-
+			classInformation.setClassMethods(allDeclaratedMethods);
 		}
 
-		// Print Project Information
-		//System.out.println("print project informations: ");
-		//		for(MethodInformation m: getShotgunSurgeryMethodList()) {
-		//			System.out.println(m.getMethodBinding().getName().toString()); //TODO why this line comment out cause bag?
-		//			m.printMethodInfomation(MethodInformation.FOR_DISPLAY);
-		//		}
 
-		//		for(MethodInformation m: allDeclaratedMethods) {
-		//			//System.out.println(m.getMethodBinding().getName().toString()); //TODO why this line comment out cause bag?
-		//			m.printMethodInfomation();
-		//		}
+		// Print Classes Information
+		System.out.println("print class informations: ");
+		for(ClassInformation classInformation: allDeclaratedClasses) {
+			//classInformation.printClassInformation(allDeclaratedMethods);
+			for(MethodInformation methodInformation: classInformation.getDisharmonyMethods()) {
+				System.out.println(methodInformation.getName() + methodInformation.numOfDisharmony());
+
+			}
+		}
 
 		System.out.println();
 
