@@ -262,7 +262,7 @@ public class ZemiAVisitor extends ASTVisitor {
 			}
 		}
 		//end Judgement
-		
+
 		// Set Classes Information
 		for(ClassInformation classInformation: allDeclaratedClasses) {
 			classInformation.setClassMethods(allDeclaratedMethods);
@@ -272,11 +272,10 @@ public class ZemiAVisitor extends ASTVisitor {
 		// Print Classes Information
 		System.out.println("print class informations: ");
 		for(ClassInformation classInformation: allDeclaratedClasses) {
-			//classInformation.printClassInformation(allDeclaratedMethods);
-			for(MethodInformation methodInformation: classInformation.getDisharmonyMethods()) {
-				System.out.println(methodInformation.getName() + methodInformation.numOfDisharmony());
-
-			}
+			classInformation.printClassInformation();
+//			for(MethodInformation methodInformation: classInformation.getDisharmonyMethods()) {
+//				System.out.println(methodInformation.getName() + methodInformation.numOfDisharmony());
+//			}
 		}
 
 		System.out.println();
