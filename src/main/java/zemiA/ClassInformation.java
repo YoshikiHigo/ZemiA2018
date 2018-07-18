@@ -2,6 +2,7 @@ package zemiA;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IMethodBinding;
@@ -157,7 +158,13 @@ public class ClassInformation {
 		return this.tcc;
 	}
 
-	public void printClassInformation(List<MethodInformation> allDeclaratedMethods) {
+	public void setClassMethods(List<MethodInformation> allDeclaratedMethods) {
+		for(IMethodBinding classMethod: classMethods) {
+			classMethodsInformation.add(MethodInformation.getMethodInformation(classMethod, allDeclaratedMethods));
+		}
+	}
+
+	public void printClassInformation() {
 		System.out.println("Class name: "+ className);
 		if(parentName != null)System.out.println("Parent Class name: "+parentName);
 		System.out.println("NOM: "+nom);
@@ -175,9 +182,7 @@ public class ClassInformation {
 		System.out.println("Refused Parent Bequest: "+this.isRPB());
 		System.out.println("Tradition Breaker: "+this.isTB());
 
-		for(IMethodBinding classMethod: classMethods) {
-			classMethodsInformation.add(MethodInformation.getMethodInformation(classMethod, allDeclaratedMethods));
-		}
+
 		System.out.println("------------this class's method information------------");
 		for(MethodInformation classMethod: classMethodsInformation) {
 			classMethod.printMethodInfomation();
@@ -302,6 +307,21 @@ public class ClassInformation {
 		if(pmlist.size() != 0)pnas = (double)nas/pmlist.size();
 		int pismnum = parentClass.getIsalist().size() + parentClass.getIsmlist().size();
 		if(pismnum != 0)bur = (double)(usedSuperFields.size()+usedSuperMethods.size())/pismnum;
+	}
+
+	public List<MethodInformation> getDisharmonyMethods(){
+//		List<MethodInformation> disharmonyMethodsList = new ArrayList<MethodInformation>();
+//		for(MethodInformation methodInformation :getMethodInformation()) {
+//			if(methodInformation.numOfDisharmony()>0) {
+//				disharmonyMethodsList.add(methodInformation);
+//			}
+//		}
+
+		List<MethodInformation> disharmonyMethodsList = classMethodsInformation.stream()
+				.filter(methodInformation -> methodInformation.numOfDisharmony() > 0)
+				.collect(Collectors.toList());
+
+		return disharmonyMethodsList;
 	}
 
 }
