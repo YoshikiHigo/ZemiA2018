@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 public class MainWindow {
   public MainWindow(List<ClassInformation> CIS) {
     JFrame frame=new JFrame();
-    frame.setTitle("Lifegame");
+    frame.setTitle("Visualizer");
     frame.setLocationRelativeTo(null);
     frame.setSize(800,600);
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
