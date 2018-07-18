@@ -1,4 +1,5 @@
 package zemiA;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.util.List;
@@ -71,7 +72,6 @@ public class BoardView  extends JPanel {
     super.paint(g);
     int xMargin=calcPrefferedPlace()[0];
     int yMargin=calcPrefferedPlace()[1];
-    int length=calcPrefferedPlace()[2];
 
 
     int height=this.getHeight();
@@ -84,45 +84,62 @@ public class BoardView  extends JPanel {
      else if(CIS.get(i).getMethodsList().size()>5)number+=2;
      else number+=1;
    }
-   length=height/number;
+   int xlength=height/number;
+
+   int LOC=0;
+   for(int i=0;i<CIS.size();i++) {
+	   LOC+=CIS.get(i).getClassLOC();
+   }
+
+   double unit=(double)height/LOC;
+   System.out.println(LOC);
 
     int sumOflengthCell=0;
     for(int c=0;c<1;c++)
     	for(int r=0;r<CIS.size();r++) {
+            g.setColor(Color.black);
+
     	    int howManyMethods=0;
     		if(CIS.get(r).getMethodsList().size()>10)howManyMethods=3;
     		else if(CIS.get(r).getMethodsList().size()>5)howManyMethods=2;
     		else howManyMethods=1;
 
-    		int lengthCell=length;
+    		int ylength;
+    		ylength=(int)(unit*(CIS.get(r).getClassLOC()));
+
+    		System.out.println(ylength);
+    		int xlengthCell=xlength;
     		xMargin=calcPrefferedPlace()[0];
     		//ウィンドウサイズに合わせてlengthCellを決定
     		if(howManyMethods==1) {
-    			lengthCell=length*1;
-    			xMargin=xMargin+(int) (length*3-lengthCell)/2;
+    			xlengthCell=xlength*1;
+    			xMargin=xMargin+(int) (xlength*3-xlengthCell)/2;
     		}
     		if(howManyMethods==2) {
-    			lengthCell=length*2;
-    			xMargin=xMargin+(int)(length*3-lengthCell)/2;
+    			xlengthCell=xlength*2;
+    			xMargin=xMargin+(int)(xlength*3-xlengthCell)/2;
     		}
-    	    if(howManyMethods==3) lengthCell=length*3;
+    	    if(howManyMethods==3) xlengthCell=xlength*3;
     		//マス左線
-			g.drawLine(xMargin,sumOflengthCell,xMargin,sumOflengthCell+lengthCell);
+			g.drawLine(xMargin,sumOflengthCell,xMargin,sumOflengthCell+ylength);
     	   //マス右線
-    	   g.drawLine(xMargin+lengthCell,sumOflengthCell,xMargin+lengthCell,sumOflengthCell+lengthCell);
+    	   g.drawLine(xMargin+xlengthCell,sumOflengthCell,xMargin+xlengthCell,sumOflengthCell+ylength);
     	   //マス上線
-           g.drawLine(xMargin,sumOflengthCell,xMargin+lengthCell,sumOflengthCell);
+           g.drawLine(xMargin,sumOflengthCell,xMargin+xlengthCell,sumOflengthCell);
            //マス下線
-           g.drawLine(xMargin,sumOflengthCell+lengthCell,xMargin+lengthCell,sumOflengthCell+lengthCell);
+           g.drawLine(xMargin,sumOflengthCell+ylength,xMargin+xlengthCell,sumOflengthCell+ylength);
            //クラス名ラベル
-           int fontSize=length;
-           if(howManyMethods==2)fontSize=(int)(length*1.5);
-           if(howManyMethods==3)fontSize=length*2;
-           Font font1=new Font("ＭＳ　Ｐゴシック",Font.PLAIN,(int)(fontSize));
+           int fontSize=ylength;
+           if(howManyMethods==2)fontSize=(int)(ylength);
+           if(howManyMethods==3)fontSize=ylength;
+           Font font1=new Font("ＭＳ　Ｐゴシック",Font.PLAIN,ylength);
            g.setFont(font1);
-           g.drawString(CIS.get(r).getName(), (int)(10+length*3), (int)(sumOflengthCell+lengthCell/2+8));
-           if(CIS.get(r).isRPB()|CIS.get(r).isTB())g.fillRect(xMargin+(c)*lengthCell,yMargin+(r)*lengthCell+1,lengthCell,lengthCell);
-           sumOflengthCell+=lengthCell;
+           g.drawString(CIS.get(r).getName(), (int)(10+xlength*3), (int)(sumOflengthCell+ylength));
+           if(CIS.get(r).isRPB())
+               if(CIS.get(r).isTB())g.setColor(Color.black);
+               else g.setColor(Color.gray);
+           if(CIS.get(r).isRPB()|CIS.get(r).isTB())g.fillRect(xMargin+1,sumOflengthCell+1,xlengthCell-1,ylength-1);
+           sumOflengthCell+=ylength;
     	}
     }
 
