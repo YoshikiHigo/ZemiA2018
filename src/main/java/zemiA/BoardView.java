@@ -92,22 +92,23 @@ public class BoardView  extends JPanel {
    }
 
    double unit=(double)height/LOC;
-   System.out.println(LOC);
+   //System.out.println(LOC);
 
     int sumOflengthCell=0;
-    for(int c=0;c<1;c++)
-    	for(int r=0;r<CIS.size();r++) {
+    for(int c=0;c<1;c++) //collumn
+    	for(int r=0;r<CIS.size();r++) {  //row
             g.setColor(Color.black);
 
     	    int howManyMethods=0;
-    		if(CIS.get(r).getMethodsList().size()>10)howManyMethods=3;
-    		else if(CIS.get(r).getMethodsList().size()>5)howManyMethods=2;
+    	    ClassInformation drawingClass = CIS.get(r);
+    		if(drawingClass.getMethodsList().size()>10)howManyMethods=3;
+    		else if(drawingClass.getMethodsList().size()>5)howManyMethods=2;
     		else howManyMethods=1;
 
     		int ylength;
-    		ylength=(int)(unit*(CIS.get(r).getClassLOC()));
+    		ylength=(int)(unit*(drawingClass.getClassLOC()));
 
-    		System.out.println(ylength);
+    		//System.out.println(ylength);
     		int xlengthCell=xlength;
     		xMargin=calcPrefferedPlace()[0];
     		//ウィンドウサイズに合わせてlengthCellを決定
@@ -134,11 +135,20 @@ public class BoardView  extends JPanel {
            if(howManyMethods==3)fontSize=ylength;
            Font font1=new Font("ＭＳ　Ｐゴシック",Font.PLAIN,ylength);
            g.setFont(font1);
-           g.drawString(CIS.get(r).getName(), (int)(10+xlength*3), (int)(sumOflengthCell+ylength));
-           if(CIS.get(r).isRPB())
-               if(CIS.get(r).isTB())g.setColor(Color.black);
-               else g.setColor(Color.gray);
-           if(CIS.get(r).isRPB()|CIS.get(r).isTB())g.fillRect(xMargin+1,sumOflengthCell+1,xlengthCell-1,ylength-1);
+           g.drawString(drawingClass.getName(), (int)(10+xlength*3), (int)(sumOflengthCell+ylength));
+//           if(CIS.get(r).isRPB())
+//        	   if(CIS.get(r).isTB())g.setColor(Color.black);
+//        	   else g.setColor(Color.gray);
+
+           //g.setColor(Color.WHITE); //Color initialize
+           Color color = Color.WHITE;
+           for(int i=0; i<drawingClass.numOfDisharmony(); i++) {
+        	   color = color.darker();
+           }
+           g.setColor(color);
+
+           //if(drawingClass.isRPB()|drawingClass.isTB())g.fillRect(xMargin+1,sumOflengthCell+1,xlengthCell-1,ylength-1);
+           g.fillRect(xMargin+1,sumOflengthCell+1,xlengthCell-1,ylength-1);
            sumOflengthCell+=ylength;
     	}
     }

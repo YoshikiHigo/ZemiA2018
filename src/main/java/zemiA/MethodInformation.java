@@ -110,12 +110,12 @@ public class MethodInformation{
 		boolean deepNesting = getMaxNesting()>1;  // MAXNESTING: SHALLOW 1
 		return dispersedCoupling && deepNesting;
 	}
-	
+
 	public boolean isBrainMethod() {
 		if((methodLOC>65)&&(wmc>=31)&&(maxNesting>=5)&&(noav > 7))return true;
 		else return false;
 	}
-	
+
 	public boolean isFeatureEnvy() {
 		if((methodatfd>5)&&(laa<1/3)&&(fdp<=2)) return true;
 		else return false;
@@ -277,11 +277,11 @@ public class MethodInformation{
 	public IMethodBinding getMethodBinding() {
 		return methodBind;
 	}
-	
+
 	public void setWMC(int WMC) {
 		wmc = WMC;
 	}
-	
+
 	public int getWMC() {
 		return wmc;
 	}
@@ -326,6 +326,8 @@ public class MethodInformation{
 		if(isIntensiveCoupling()) count++;
 		if(isDispersedCoupling()) count++;
 		if(isShotgunSurgery()) count++;
+		if(isBrainMethod()) count++;
+		if(isFeatureEnvy()) count++;
 
 		return count;
 	}

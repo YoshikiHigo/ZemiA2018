@@ -192,6 +192,7 @@ public class ClassInformation {
 		System.out.println("BrainClass: "+this.isBrainClass());
 		System.out.println("Refused Parent Bequest: "+this.isRPB());
 		System.out.println("Tradition Breaker: "+this.isTB());
+		System.out.println("Disharmony num:" + this.numOfDisharmony());
 
 
 		System.out.println("------------this class's method information------------");
@@ -289,22 +290,22 @@ public class ClassInformation {
 		&& (parentClass.getAMW() > 2.0 && parentClass.getNOM() > 5 && parentClass.getWMC() >= 14);
 		else return false;
 	}
-	
+
 	public boolean isGodClass() {
 		if((classatfd>5)&&(wmc>=47)&&(tcc<1/3))return true;
 		else return false;
 	}
-	
+
 	public boolean isDataClass() {
 		if((classWOC < 1/3)&&(((nopa+noam>5)&&(wmc<31))||((nopa + noam>7)&&(wmc < 47))))return true;
 		else return false;
 	}
-	
+
 	public boolean isBrainClass() {
 		if((((numOfBrainMethod()==1)&&(classLOC >= 195))||((numOfBrainMethod()>1)&&(classLOC >= 2*195)&&(wmc >= 2*47)))&&((wmc>=47)&&(tcc < 1/2)))return true;
 		else return false;
 	}
-	
+
 	public void addChildClass(ClassInformation child) {
 		childClass.add(child);
 	}
@@ -350,13 +351,29 @@ public class ClassInformation {
 
 		return disharmonyMethodsList;
 	}
-	
+
 	private int numOfBrainMethod(){
 		int num = 0;
 		for(MethodInformation mData : classMethodsInformation) {
 			if(mData.isBrainMethod()) num++;
 		}
 		return num;
+	}
+
+	public int numOfDisharmony() { //include method disharmony
+		int disharmonyCount = 0;
+		if(isBrainClass()) disharmonyCount++;
+		if(isDataClass()) disharmonyCount++;
+		if(isGodClass()) disharmonyCount++;
+		if(isRPB()) disharmonyCount++;
+		if(isTB()) disharmonyCount++;
+		int methodDisharmony = getDisharmonyMethods().stream()
+				.collect(Collectors.summingInt(methodInformation -> methodInformation.numOfDisharmony()));
+
+		disharmonyCount += methodDisharmony;
+
+
+		return disharmonyCount;
 	}
 
 }
