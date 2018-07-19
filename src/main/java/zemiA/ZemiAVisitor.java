@@ -74,7 +74,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	private HashMap<String, Integer> methodLOCmap = new HashMap<String, Integer>();
 	private int publicFunctionalMethod;
 	private int publicMethod;
-	private int woc;
+	private double woc;
 	private int classLOC;
 	private int noam = 0;
 	//	public int dummy;//NOPA test
@@ -84,6 +84,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	private int methodATFDviaaccessor=0;
 	private int foreigndata=0;
 	private int laalocal=0;
+	private int methodWMC = 0;
 	/* ================= */
 
 
@@ -221,8 +222,10 @@ public class ZemiAVisitor extends ASTVisitor {
 				}
 			}
 			int maxpair = length*(length-1)/2;
-			double tcc = (double) pair/maxpair;
-			classinformation.setTCC(tcc);
+			if(maxpair != 0) {
+				double tcc = (double) pair/maxpair;
+				classinformation.setTCC(tcc);
+			}
 		}
 
 		//chapter 6
@@ -381,9 +384,9 @@ public class ZemiAVisitor extends ASTVisitor {
 		}
 		for(String str : fieldlist) {
 			checkedClass.setDeclaringFieldList(str);
+			checkedClass.setClassWOC(woc);
 		}
 		fieldlist.clear();
-		checkedClass.setClassWOC(woc);
 		checkedClass.setClassLOC(classLOC);
 		checkedClass.setNOAM(this.noam);
 		checkedClass.setNOPA(this.publicfields);
@@ -397,7 +400,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	public boolean visit(MethodDeclaration node) {
 		// to access from MethodInvocation to MethodDeclaration
 		methodDeclarationStack.push(node);
-
+		methodWMC = 0;
 		/* =============== */
 		this.publicMethod++;
 		this.publicFunctionalMethod++;
@@ -435,6 +438,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	public void endVisit(MethodDeclaration node) {
 		// to access from MethodInvocation to MethodDeclaration
 		methodDeclarationStack.pop();
+		getMethodInformation(node.resolveBinding()).setWMC(methodWMC);
 
 		MethodInformation aaa = getMethodInformation(methodname);
 		aaa.setDeclaringClass(classname);
@@ -622,30 +626,35 @@ public class ZemiAVisitor extends ASTVisitor {
 	public boolean visit(ForStatement node) {
 		// TODO Auto-generated method stub
 		WMC++;
+		methodWMC++;
 		return super.visit(node);
 	}
 	@Override
 	public boolean visit(IfStatement node) {
 		// TODO Auto-generated method stub
 		WMC++;
+		methodWMC++;
 		return super.visit(node);
 	}
 	@Override
 	public boolean visit(SwitchStatement node) {
 		// TODO Auto-generated method stub
 		WMC++;
+		methodWMC++;
 		return super.visit(node);
 	}
 	@Override
 	public boolean visit(WhileStatement node) {
 		// TODO Auto-generated method stub
 		WMC++;
+		methodWMC++;
 		return super.visit(node);
 	}
 	@Override
 	public boolean visit(DoStatement node) {
 		// TODO Auto-generated method stub
 		WMC++;
+		methodWMC++;
 		return super.visit(node);
 	}
 	@Override

@@ -36,13 +36,13 @@ public class ClassInformation {
 	private List<IVariableBinding> usedSuperFields;
 	private List<IMethodBinding> usedSuperMethods;
 
-  private int classWOC = 0;
+  private double classWOC = -1;
 	private int classLOC = 0;
 
 	private int noam=0;//the Number of Acceccor Methods
 	private int nopa=0;//the Number Of Public Attributes
 	private int classatfd=0;
-	private double tcc=0;
+	private double tcc=-1;
 	private List<IMethodBinding> invokingmethod = new ArrayList<IMethodBinding>();
 	private List<String> declaringfieldlist = new ArrayList<String>();
 
@@ -84,11 +84,11 @@ public class ClassInformation {
 		return maxNesting;
 	}
 
-	public void setClassWOC(int woc) {
+	public void setClassWOC(double woc) {
 		classWOC = woc;
 	}
 
-	public int getClassWOC() {
+	public double getClassWOC() {
 		return classWOC;
 	}
 
@@ -167,18 +167,29 @@ public class ClassInformation {
 	public void printClassInformation() {
 		System.out.println("Class name: "+ className);
 		if(parentName != null)System.out.println("Parent Class name: "+parentName);
-		System.out.println("NOM: "+nom);
-		System.out.println("WMC: "+wmc);
 		System.out.println("AMW: "+amw);
-		System.out.println("NProtM: "+nprotm);
+		System.out.println("ATFD: "+classatfd);
 		if(bovr!=-1)System.out.println("BOvR: "+ bovr);
 		else System.out.println("BOvR: parent class is made by third party");
-		if(nas!=-1)System.out.println("NAS: "+nas);
-		else System.out.println("NAS: parent class is made by third party");
-		if(pnas!=-1)System.out.println("PNAS:" +pnas);
-		else System.out.println("PNAS: parent class is made by third party");
 		if(bur!=-1)System.out.println("BUR: "+bur);
 		else System.out.println("BUR: parent class is made by third party");
+		System.out.println("LOC: "+classLOC);
+		if(nas!=-1)System.out.println("NAS: "+nas);
+		else System.out.println("NAS: parent class is made by third party");
+		System.out.println("NOAM: "+noam);
+		System.out.println("NOM: "+nom);
+		System.out.println("NOPA: "+nopa);
+		System.out.println("NProtM: "+nprotm);
+		if(pnas!=-1)System.out.println("PNAS:" +pnas);
+		else System.out.println("PNAS: parent class is made by third party");
+		if(tcc != -1) System.out.println("TCC: "+tcc);
+		else System.out.println("TCC: no Tight Class Cohesion");
+		System.out.println("WMC: "+wmc);
+		if(classWOC != -1)System.out.println("WOC: "+classWOC);
+		else System.out.println("WOC: has no public member");
+		System.out.println("God Class: "+this.isGodClass());
+		System.out.println("Data Class: "+this.isDataClass());
+		System.out.println("BrainClass: "+this.isBrainClass());
 		System.out.println("Refused Parent Bequest: "+this.isRPB());
 		System.out.println("Tradition Breaker: "+this.isTB());
 
@@ -278,6 +289,22 @@ public class ClassInformation {
 		&& (parentClass.getAMW() > 2.0 && parentClass.getNOM() > 5 && parentClass.getWMC() >= 14);
 		else return false;
 	}
+	
+	public boolean isGodClass() {
+		if((classatfd>5)&&(wmc>=47)&&(tcc<1/3))return true;
+		else return false;
+	}
+	
+	public boolean isDataClass() {
+		if((classWOC < 1/3)&&(((nopa+noam>5)&&(wmc<31))||((nopa + noam>7)&&(wmc < 47))))return true;
+		else return false;
+	}
+	
+	public boolean isBrainClass() {
+		if((((numOfBrainMethod()==1)&&(classLOC >= 195))||((numOfBrainMethod()>1)&&(classLOC >= 2*195)&&(wmc >= 2*47)))&&((wmc>=47)&&(tcc < 1/2)))return true;
+		else return false;
+	}
+	
 	public void addChildClass(ClassInformation child) {
 		childClass.add(child);
 	}
@@ -322,6 +349,14 @@ public class ClassInformation {
 				.collect(Collectors.toList());
 
 		return disharmonyMethodsList;
+	}
+	
+	private int numOfBrainMethod(){
+		int num = 0;
+		for(MethodInformation mData : classMethodsInformation) {
+			if(mData.isBrainMethod()) num++;
+		}
+		return num;
 	}
 
 }
