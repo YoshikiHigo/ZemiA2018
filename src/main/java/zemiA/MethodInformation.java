@@ -28,7 +28,7 @@ public class MethodInformation{
 	private int methodatfd=0;
 	private int noav=0;//the Number of accessed variables
 	private int fdp=0;//foreign data provider
-	private double laa=0;
+	private double laa=-1;
 	private List<IMethodBinding> invokingmethod = new ArrayList<IMethodBinding>();
 	private List<String> accessedfeildlist = new ArrayList<String>();
 	private List<String> accessednormalvariables = new ArrayList<String>();
@@ -37,6 +37,7 @@ public class MethodInformation{
 	private int fromownclass=0;
 	private int fromforeignclass=0;
 	private int methodLOC = 0;
+	private int wmc = 0;
 
 	public MethodInformation(IMethodBinding declaratedMethodBind) {
 		methodBind = declaratedMethodBind;
@@ -108,6 +109,16 @@ public class MethodInformation{
 		boolean dispersedCoupling = getCINT()>7 && getCDISP()>=(double)1/2;
 		boolean deepNesting = getMaxNesting()>1;  // MAXNESTING: SHALLOW 1
 		return dispersedCoupling && deepNesting;
+	}
+	
+	public boolean isBrainMethod() {
+		if((methodLOC>65)&&(wmc>=31)&&(maxNesting>=5)&&(noav > 7))return true;
+		else return false;
+	}
+	
+	public boolean isFeatureEnvy() {
+		if((methodatfd>5)&&(laa<1/3)&&(fdp<=2)) return true;
+		else return false;
 	}
 
 	public void setMethodLOC(int loc) {
@@ -231,7 +242,7 @@ public class MethodInformation{
 	}
 
 	public void setLAA() {
-		this.laa=(double)this.fromownclass/(this.fromownclass+this.fromforeignclass);
+		if(this.fromownclass+this.fromforeignclass != 0) this.laa=(double)this.fromownclass/(this.fromownclass+this.fromforeignclass);
 	}
 
 	public double getLAA() {
@@ -266,16 +277,32 @@ public class MethodInformation{
 	public IMethodBinding getMethodBinding() {
 		return methodBind;
 	}
-
+	
+	public void setWMC(int WMC) {
+		wmc = WMC;
+	}
+	
+	public int getWMC() {
+		return wmc;
+	}
 
 	public void printMethodInfomation(){
 		System.out.println("methodName: " + getName());
 		System.out.println("declarated class: " + methodBind.getDeclaringClass().getBinaryName().toString());
-		System.out.println("CINT: " + getCINT());
-		System.out.println("CDISP: " + getCDISP());
-		System.out.println("MAXNESTING: " + getMaxNesting());
-		System.out.println("CM: " + getCM());
-		System.out.println("CC: " + getCC());
+		System.out.println("ATFD: " + methodatfd);
+		System.out.println("CC: " + cc);
+		System.out.println("CDISP: " + cdisp);
+		System.out.println("CINT: " + cint);
+		System.out.println("CM: " + cm);
+		System.out.println("FDP: " + fdp);
+		if(laa != -1) System.out.println("LAA: " + laa);
+		else System.out.println("LAA: no access");
+		System.out.println("LOC: " + methodLOC);
+		System.out.println("MAXNESTING: " + maxNesting);
+		System.out.println("NOAV: " + noav);
+		System.out.println("WMC: " + wmc);
+		System.out.println("Brain Method: " + isBrainMethod());
+		System.out.println("Feature Envy: " + isFeatureEnvy());
 		System.out.println("intensive coupling: " + isIntensiveCoupling());
 		System.out.println("dispersed coupling: " + isDispersedCoupling());
 		System.out.println("shotgun surgery: " + isShotgunSurgery());
