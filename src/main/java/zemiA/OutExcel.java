@@ -37,19 +37,19 @@ public class OutExcel {
 			a.setCellValue("Parent Class name");
 			if(Data.getParentBindig() != null) b.setCellValue(Data.getParentBindig().getBinaryName());
 			else b.setCellValue("has no parent");
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
 			a.setCellValue("AMW");
 			b.setCellValue(Data.getAMW());
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
 			a.setCellValue("ATFD");
 			b.setCellValue(Data.getClassATFD());
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
@@ -57,7 +57,7 @@ public class OutExcel {
 			if(Data.getBOvR() != -1)
 				b.setCellValue(Data.getBOvR());
 			else b.setCellValue("parent is a third-party class");
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
@@ -65,13 +65,13 @@ public class OutExcel {
 			if(Data.getBUR() != -1)
 				b.setCellValue(Data.getBUR());
 			else b.setCellValue("parent is a third-party class");
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
 			a.setCellValue("LOC");
 			b.setCellValue(Data.getClassLOC());
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
@@ -79,7 +79,7 @@ public class OutExcel {
 			if(Data.getNAS() != -1)
 				b.setCellValue(Data.getNAS());
 			else b.setCellValue("parent is a third-party class");
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
@@ -91,19 +91,19 @@ public class OutExcel {
 			b = row.createCell(1);
 			a.setCellValue("NOM");
 			b.setCellValue(Data.getNOM());
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
 			a.setCellValue("NOPA");
 			b.setCellValue(Data.getNOPA());
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
 			a.setCellValue("NProtM");
 			b.setCellValue(Data.getNProtM());
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
@@ -111,7 +111,7 @@ public class OutExcel {
 			if(Data.getPNAS() != -1)
 				b.setCellValue(Data.getPNAS());
 			else b.setCellValue("parent is a third-party class");
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
@@ -124,26 +124,26 @@ public class OutExcel {
 			b = row.createCell(1);
 			a.setCellValue("WMC");
 			b.setCellValue(Data.getWMC());
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
 			a.setCellValue("WOC");
 			if(Data.getClassWOC() != -1) b.setCellValue(Data.getClassWOC());
 			else b.setCellValue("has no public member");
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
 			a.setCellValue("God Class");
 			b.setCellValue(Data.isGodClass());
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
 			a.setCellValue("Data Class");
 			b.setCellValue(Data.isDataClass());
-			
+
 			row = sheet.createRow(i++);
 			a = row.createCell(0);
 			b = row.createCell(1);
@@ -162,6 +162,12 @@ public class OutExcel {
 			a.setCellValue("Tradition Breaker");
 			b.setCellValue(Data.isTB());
 
+			row = sheet.createRow(i++);
+			a = row.createCell(0);
+			b = row.createCell(1);
+			a.setCellValue("Number of Disharmonies");
+			b.setCellValue(Data.numOfDisharmony());
+
 			for(MethodInformation mData : Data.getMethodInformation()) {
 				i++;
 
@@ -170,19 +176,19 @@ public class OutExcel {
 				b = row.createCell(1);
 				a.setCellValue("methodName");
 				b.setCellValue(mData.getName());
-				
+
 				row = sheet.createRow(i++);
 				a = row.createCell(0);
 				b = row.createCell(1);
 				a.setCellValue("ATFD");
 				b.setCellValue(mData.getmethodATFD());
-				
+
 				row = sheet.createRow(i++);
 				a = row.createCell(0);
 				b = row.createCell(1);
 				a.setCellValue("CC");
 				b.setCellValue(mData.getCC());
-				
+
 				row = sheet.createRow(i++);
 				a = row.createCell(0);
 				b = row.createCell(1);
@@ -194,7 +200,7 @@ public class OutExcel {
 				b = row.createCell(1);
 				a.setCellValue("CINT");
 				b.setCellValue(mData.getCINT());
-				
+
 				row = sheet.createRow(i++);
 				a = row.createCell(0);
 				b = row.createCell(1);
@@ -206,14 +212,14 @@ public class OutExcel {
 				b = row.createCell(1);
 				a.setCellValue("FDP");
 				b.setCellValue(mData.getFDP());
-				
+
 				row = sheet.createRow(i++);
 				a = row.createCell(0);
 				b = row.createCell(1);
 				a.setCellValue("LAA");
 				if(mData.getLAA() != -1) b.setCellValue(mData.getLAA());
 				else b.setCellValue("no access");
-				
+
 				row = sheet.createRow(i++);
 				a = row.createCell(0);
 				b = row.createCell(1);
@@ -237,13 +243,13 @@ public class OutExcel {
 				b = row.createCell(1);
 				a.setCellValue("WMC");
 				b.setCellValue(mData.getWMC());
-				
+
 				row = sheet.createRow(i++);
 				a = row.createCell(0);
 				b = row.createCell(1);
 				a.setCellValue("Brain Method");
 				b.setCellValue(mData.isBrainMethod());
-				
+
 				row = sheet.createRow(i++);
 				a = row.createCell(0);
 				b = row.createCell(1);

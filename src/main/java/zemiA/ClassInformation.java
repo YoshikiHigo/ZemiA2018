@@ -1,6 +1,7 @@
 package zemiA;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -158,9 +159,9 @@ public class ClassInformation {
 		return this.tcc;
 	}
 
-	public void setClassMethods(List<MethodInformation> allDeclaratedMethods) {
+	public void setClassMethods(HashMap<IMethodBinding,MethodInformation> allDeclaratedMethods) {
 		for(IMethodBinding classMethod: classMethods) {
-			classMethodsInformation.add(MethodInformation.getMethodInformation(classMethod, allDeclaratedMethods));
+			classMethodsInformation.add(allDeclaratedMethods.get(classMethod));
 		}
 	}
 
@@ -203,16 +204,16 @@ public class ClassInformation {
 		System.out.println();
 	}
 
-
-	public static ClassInformation getClassInformation(ITypeBinding classBind, List<ClassInformation> classes) {
-		for(ClassInformation classInformation: classes) {
-			if(classInformation.getClassBinding().equals(classBind)) {
-				return classInformation;
-			}
-		}
-		// if the class is not project class
-		return null;
-	}
+	//legacy
+	//	public static ClassInformation getClassInformation(ITypeBinding classBind, List<ClassInformation> classes) {
+	//		for(ClassInformation classInformation: classes) {
+	//			if(classInformation.getClassBinding().equals(classBind)) {
+	//				return classInformation;
+	//			}
+	//		}
+	//		// if the class is not project class
+	//		return null;
+	//	}
 	public ITypeBinding getParentBindig() {
 		return parentBinding;
 	}
@@ -292,17 +293,18 @@ public class ClassInformation {
 	}
 
 	public boolean isGodClass() {
-		if((classatfd>5)&&(wmc>=47)&&(tcc<1/3))return true;
+		if((classatfd>5)&&(wmc>=47)&&(tcc<(double)1/3))return true;
 		else return false;
 	}
 
 	public boolean isDataClass() {
-		if((classWOC < 1/3)&&(((nopa+noam>5)&&(wmc<31))||((nopa + noam>7)&&(wmc < 47))))return true;
+		if((classWOC < (double)1/3)&&(((nopa+noam>5)&&(wmc<31))||((nopa + noam>7)&&(wmc < 47)))) return true;
 		else return false;
 	}
 
 	public boolean isBrainClass() {
-		if((((numOfBrainMethod()==1)&&(classLOC >= 195))||((numOfBrainMethod()>1)&&(classLOC >= 2*195)&&(wmc >= 2*47)))&&((wmc>=47)&&(tcc < 1/2)))return true;
+		if((((numOfBrainMethod()==1)&&(classLOC >= 195))||((numOfBrainMethod()>1)&&(classLOC >= 2*195)
+				&&(wmc >= 2*47)))&&((wmc>=47)&&(tcc < (double)1/2))) return true;
 		else return false;
 	}
 
