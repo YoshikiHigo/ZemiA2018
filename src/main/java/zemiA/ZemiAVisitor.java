@@ -41,8 +41,8 @@ public class ZemiAVisitor extends ASTVisitor {
 	private int methodNesting = 0;
 	private int methodMaxNesting = 0;
 	private List<IMethodBinding> classMethods;
-	private List<ClassInformation> allDeclaratedClasses = new ArrayList<ClassInformation>();  //project's classes
-	private List<MethodInformation> allDeclaratedMethods = new ArrayList<MethodInformation>();  //project's methods
+	private HashMap<ITypeBinding,ClassInformation> allDeclaratedClasses = new HashMap<>();  //project's classes
+	private HashMap<IMethodBinding,MethodInformation> allDeclaratedMethods = new HashMap<>();  //project's methods
 	private List<MethodInvocation> allInvokedMethods = new ArrayList<MethodInvocation>();
 	private HashMap<MethodInvocation,MethodDeclaration> allInvokingMethods =
 			new HashMap<MethodInvocation,MethodDeclaration>();  //method invocation is unique
@@ -95,13 +95,13 @@ public class ZemiAVisitor extends ASTVisitor {
 		// Judgement over Project by Lists
 
 		//chapter 5
-		for (MethodInformation methodInformation : allDeclaratedMethods) {
+		for (MethodInformation methodInformation : allDeclaratedMethods.values()) {
 			for(IMethodBinding calledmethod : methodInformation.getInvokingMethods()) {
-				MethodInformation invokedmethodinfo = getMethodInformation(calledmethod);
+				MethodInformation invokedmethodinfo = allDeclaratedMethods.get(calledmethod);
 				if(invokedmethodinfo!=null && invokedmethodinfo.isAccessor()) {
 					this.methodATFDviaaccessor+=1;
 					//以下、FDPを求めるための準備 : via accessor method
-					for(ClassInformation classinformation : allDeclaratedClasses) {
+					for(ClassInformation classinformation : allDeclaratedClasses.values()) {
 						if(classinformation.isDefined(calledmethod)) {
 							this.foreigndata+=1;
 							ITypeBinding tb = classinformation.getClassBinding();
@@ -112,7 +112,7 @@ public class ZemiAVisitor extends ASTVisitor {
 				List<String> accessedfield = methodInformation.getAccessedFields();
 				List<ITypeBinding> provider = methodInformation.getProviderClasses();
 				List<String> declaringfield;
-				for(ClassInformation classinformation : allDeclaratedClasses) {
+				for(ClassInformation classinformation : allDeclaratedClasses.values()) {
 					declaringfield=classinformation.getDeclaringFieldList();
 					for(String field:accessedfield) {
 						//						if(declaringfield.contains(field)) {
@@ -130,10 +130,10 @@ public class ZemiAVisitor extends ASTVisitor {
 			methodInformation.setmethodATFD();
 			this.methodATFDviaaccessor=0;
 		}
-		for(ClassInformation classinformation : allDeclaratedClasses) {
+		for(ClassInformation classinformation : allDeclaratedClasses.values()) {
 			List<String> classaccessedfields = new ArrayList<String>();
 			for(IMethodBinding declaredmethod : classinformation.getMethodsList()) {
-				MethodInformation method = getMethodInformation(declaredmethod);
+				MethodInformation method = allDeclaratedMethods.get(declaredmethod);
 				for(String s : method.getAccessedFields()) {
 					if(!classaccessedfields.contains(s)) {
 						classaccessedfields.add(s);
@@ -147,7 +147,7 @@ public class ZemiAVisitor extends ASTVisitor {
 			}
 			List<IMethodBinding> classinvokedmethodlist = new ArrayList<IMethodBinding>();
 			for(IMethodBinding declaredmethod : classinformation.getMethodsList()) {
-				MethodInformation method = getMethodInformation(declaredmethod);
+				MethodInformation method = allDeclaratedMethods.get(declaredmethod);
 				for(IMethodBinding mb : method.getInvokingMethods()) {
 					if(!classinvokedmethodlist.contains(mb)) {
 						classinvokedmethodlist.add(mb);
@@ -155,7 +155,7 @@ public class ZemiAVisitor extends ASTVisitor {
 				}
 			}
 			for(IMethodBinding mb : classinvokedmethodlist) {
-				MethodInformation method = getMethodInformation(mb);
+				MethodInformation method = allDeclaratedMethods.get(mb);
 				if(method!=null) {
 					if(method.isAccessor()) {
 						this.classATFDviaaccessor+=1;
@@ -166,7 +166,7 @@ public class ZemiAVisitor extends ASTVisitor {
 			this.classATFDviaaccessor=0;
 			this.classATFDdirect=0;
 		}
-		for(ClassInformation classinformation : allDeclaratedClasses) {
+		for(ClassInformation classinformation : allDeclaratedClasses.values()) {
 			List<String> classfields = classinformation.getDeclaringFieldList();
 			List<IMethodBinding> classmethods = classinformation.getMethodsList();
 			int nofield = classfields.size();
@@ -175,7 +175,7 @@ public class ZemiAVisitor extends ASTVisitor {
 			for(int i = 0;i<nofield;i++) {
 				int noftrueprev=0;
 				for(int j = 0;j<length;j++) {
-					relation[i][j]=getMethodInformation(classmethods.get(j)).isAccessed(classfields.get(i));
+					relation[i][j]=allDeclaratedMethods.get(classmethods.get(j)).isAccessed(classfields.get(i));
 					if(relation[i][j]) {
 						noftrueprev+=1;
 					}
@@ -186,7 +186,7 @@ public class ZemiAVisitor extends ASTVisitor {
 					for(int j = 0;j<length;j++) {
 						if(relation[i][j]) {
 							for(int k=0;k<length;k++) {
-								boolean temp = getMethodInformation(classmethods.get(j)).isInvoked(classmethods.get(k));
+								boolean temp = allDeclaratedMethods.get(classmethods.get(j)).isInvoked(classmethods.get(k));
 								relation[i][k]=relation[i][k]||temp;
 							}
 						}
@@ -232,17 +232,17 @@ public class ZemiAVisitor extends ASTVisitor {
 		for(MethodInvocation invokedMethod: allInvokedMethods) {
 			IMethodBinding invokedMethodBind = invokedMethod.resolveMethodBinding();
 			IMethodBinding invokingMethodBind = allInvokingMethods.get(invokedMethod).resolveBinding();
-			ClassInformation invokingClass = getClassInformation(invokingMethodBind.getDeclaringClass());
-			MethodInformation invokingMethod = getMethodInformation(invokingMethodBind);
+			ClassInformation invokingClass = allDeclaratedClasses.get(invokingMethodBind.getDeclaringClass());
+			MethodInformation invokingMethod = allDeclaratedMethods.get(invokingMethodBind);
 			if(isDistinctMethod(invokingClass, invokedMethodBind) && isProjectMethod(invokedMethodBind)) {
 				invokingMethod.invocate(invokedMethodBind);
-				getMethodInformation(invokedMethodBind).invocated(invokingMethodBind);
+				allDeclaratedMethods.get(invokedMethodBind).invocated(invokingMethodBind);
 			}
 		}
 
 		//chapter 7
-		for(ClassInformation Data : allDeclaratedClasses) {
-			ClassInformation pData = getClassInformation(Data.getParentBindig());
+		for(ClassInformation Data : allDeclaratedClasses.values()) {
+			ClassInformation pData = allDeclaratedClasses.get(Data.getParentBindig());
 			if(pData != null) {
 				Data.setParentClass(pData);
 				pData.addChildClass(Data);
@@ -267,14 +267,14 @@ public class ZemiAVisitor extends ASTVisitor {
 		//end Judgement
 
 		// Set Classes Information
-		for(ClassInformation classInformation: allDeclaratedClasses) {
-			classInformation.setClassMethods(allDeclaratedMethods);
+		for(ClassInformation classInformation: allDeclaratedClasses.values()) {
+			classInformation.setClassMethods(new ArrayList<>(allDeclaratedMethods.values()));
 		}
 
 
 		// Print Classes Information
 		System.out.println("print class informations: ");
-		for(ClassInformation classInformation: allDeclaratedClasses) {
+		for(ClassInformation classInformation: allDeclaratedClasses.values()) {
 			classInformation.printClassInformation();
 //			for(MethodInformation methodInformation: classInformation.getDisharmonyMethods()) {
 //				System.out.println(methodInformation.getName() + methodInformation.numOfDisharmony());
@@ -294,7 +294,7 @@ public class ZemiAVisitor extends ASTVisitor {
 
 	private boolean isProjectMethod(IMethodBinding methodBind) {
 		boolean includeFlag = false;
-		for(MethodInformation declaratedMethod: allDeclaratedMethods) {
+		for(MethodInformation declaratedMethod: allDeclaratedMethods.values()) {
 			includeFlag = declaratedMethod.getMethodBinding().equals(methodBind);
 			if(includeFlag == true) {
 				break;
@@ -303,26 +303,28 @@ public class ZemiAVisitor extends ASTVisitor {
 		return includeFlag;
 	}
 
-	private MethodInformation getMethodInformation(IMethodBinding methodBind) {
-		for(MethodInformation methodInformation: allDeclaratedMethods) {
-			if(methodInformation.getMethodBinding().equals(methodBind)) {
-				return methodInformation;
-			}
-		}
-		// if the method is not project method
-		return null;
-	}
+	//TODO legacy
+//	private MethodInformation getMethodInformation(IMethodBinding methodBind) {
+//		for(MethodInformation methodInformation: allDeclaratedMethods.values()) {
+//			if(methodInformation.getMethodBinding().equals(methodBind)) {
+//				return methodInformation;
+//			}
+//		}
+//		// if the method is not project method
+//		return null;
+//	}
 
-	private ClassInformation getClassInformation(ITypeBinding classBind) {
-		if(classBind != null) {
-			for(ClassInformation classInformation: allDeclaratedClasses) {
-				if(classInformation.getClassBinding().equals(classBind)) {
-					return classInformation;
-				}
-			}
-		}
-		return null;
-	}
+	//TODO legacy
+//	private ClassInformation getClassInformation(ITypeBinding classBind) {
+//		if(classBind != null) {
+//			for(ClassInformation classInformation: allDeclaratedClasses.values()) {
+//				if(classInformation.getClassBinding().equals(classBind)) {
+//					return classInformation;
+//				}
+//			}
+//		}
+//		return null;
+//	}
 
 	@Override
 	public boolean visit(TypeDeclaration node) {
@@ -343,14 +345,14 @@ public class ZemiAVisitor extends ASTVisitor {
 
 		for(MethodDeclaration mb: node.getMethods()) {
 			classMethods.add(mb.resolveBinding());
-			allDeclaratedMethods.add(new MethodInformation(mb.resolveBinding()));
+			allDeclaratedMethods.put(mb.resolveBinding(),new MethodInformation(mb.resolveBinding()));
 		}
 
 
 		publicFunctionalMethod = 0;
 		publicMethod = 0;
 		//classMethods = new ArrayList<IMethodBinding>();
-		allDeclaratedClasses.add(new ClassInformation(node.resolveBinding()));
+		allDeclaratedClasses.put(node.resolveBinding(), new ClassInformation(node.resolveBinding()));
 
 		classLOC = unit.getLineNumber(node.getStartPosition() + node.getLength() - 1) + 1
 				- unit.getLineNumber(node.getStartPosition());
@@ -368,7 +370,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	public void endVisit(TypeDeclaration node) {
 		// set searched class information
 		//ClassInformation checkedClass = new ClassInformation(node.resolveBinding());
-		ClassInformation checkedClass = getClassInformation(node.resolveBinding());
+		ClassInformation checkedClass = allDeclaratedClasses.get(node.resolveBinding());
 		//allDeclaratedClasses.add(checkedClass);
 
 		checkedClass.setClassInformation(classMethods ,classMaxNesting , NOM, WMC, NProtM,
@@ -407,7 +409,7 @@ public class ZemiAVisitor extends ASTVisitor {
 		/*System.out.print(node.getName() + " method LOC = ");
 		System.out.println(unit.getLineNumber(node.getStartPosition() + node.getLength() - 1) + 1
 				- unit.getLineNumber(node.getStartPosition()));*/
-		MethodInformation aaa = getMethodInformation(node.resolveBinding());
+		MethodInformation aaa = allDeclaratedMethods.get(node.resolveBinding());
 		aaa.setMethodLOC(unit.getLineNumber(node.getStartPosition() + node.getLength() - 1) + 1
 				- unit.getLineNumber(node.getStartPosition()));
 		methodname = node.resolveBinding();
@@ -438,9 +440,9 @@ public class ZemiAVisitor extends ASTVisitor {
 	public void endVisit(MethodDeclaration node) {
 		// to access from MethodInvocation to MethodDeclaration
 		methodDeclarationStack.pop();
-		getMethodInformation(node.resolveBinding()).setWMC(methodWMC);
+		allDeclaratedMethods.get(node.resolveBinding()).setWMC(methodWMC);
 
-		MethodInformation aaa = getMethodInformation(methodname);
+		MethodInformation aaa = allDeclaratedMethods.get(methodname);
 		aaa.setDeclaringClass(classname);
 		aaa.setNOAV();
 		List<String> accessedfieldlist = aaa.getAccessedFields();
@@ -452,7 +454,7 @@ public class ZemiAVisitor extends ASTVisitor {
 		aaa.setMethodATFDDirect(this.methodATFDdirect);
 		this.methodATFDdirect=0;
 
-		getMethodInformation(node.resolveBinding()).setMaxNesting(methodMaxNesting);
+		allDeclaratedMethods.get(node.resolveBinding()).setMaxNesting(methodMaxNesting);
 		methodMaxNesting = 0;
 		methodNesting = 0;
 		super.endVisit(node);
@@ -463,7 +465,7 @@ public class ZemiAVisitor extends ASTVisitor {
 		allInvokedMethods.add(node);
 		allInvokingMethods.put(node, methodDeclarationStack.peek());
 
-		MethodInformation aaa = getMethodInformation(methodname);
+		MethodInformation aaa = allDeclaratedMethods.get(methodname);
 		List<IMethodBinding> invokingmethod = aaa.getInvokingMethods();
 		if(!invokingmethod.contains(node.resolveMethodBinding())) {
 			aaa.setInvokingMethods(node.resolveMethodBinding());
@@ -495,7 +497,7 @@ public class ZemiAVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(ReturnStatement node) {
 		//		 System.out.println(node.getExpression());
-		MethodInformation m = this.getMethodInformation(methodname);
+		MethodInformation m = this.allDeclaratedMethods.get(methodname);
 		if (node.getExpression() == null) {
 
 		} else if (node.getExpression().toString().startsWith("this")) {
@@ -561,7 +563,7 @@ public class ZemiAVisitor extends ASTVisitor {
 		//		System.out.println("*"+node.getLeftHandSide()+node.getOperator()+node.getRightHandSide());
 		String lefthand = node.getLeftHandSide().toString();
 		String righthand = node.getRightHandSide().toString();
-		MethodInformation aaa = getMethodInformation(methodname);
+		MethodInformation aaa = allDeclaratedMethods.get(methodname);
 		List<String> parameters = aaa.getParameter();
 		//? Setter method
 		if(fieldlist.contains(lefthand)) {
@@ -610,7 +612,7 @@ public class ZemiAVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(FieldAccess node) {
-		MethodInformation aaa = getMethodInformation(methodname);
+		MethodInformation aaa = allDeclaratedMethods.get(methodname);
 		List<String> bbb = aaa.getAccessedFields();
 		if(!(bbb.contains(node.getName().toString()))) {
 			//			System.out.println(node.getName());
@@ -680,18 +682,19 @@ public class ZemiAVisitor extends ASTVisitor {
 	}
 
 
-	public List<MethodInformation> getShotgunSurgeryMethodList(){
-		List<MethodInformation> shotgunSurgeryMethods = new ArrayList<MethodInformation>();
-		for(MethodInformation methodInformation: allDeclaratedMethods) {
-			if(methodInformation.isShotgunSurgery()) {
-				shotgunSurgeryMethods.add(methodInformation);
-			}
-		}
-		return shotgunSurgeryMethods;
-	}
+	//TODO iru?
+//	public List<MethodInformation> getShotgunSurgeryMethodList(){
+//		List<MethodInformation> shotgunSurgeryMethods = new ArrayList<MethodInformation>();
+//		for(MethodInformation methodInformation: allDeclaratedMethods.values()) {
+//			if(methodInformation.isShotgunSurgery()) {
+//				shotgunSurgeryMethods.add(methodInformation);
+//			}
+//		}
+//		return shotgunSurgeryMethods;
+//	}
 
 	public List<ClassInformation> getClassInformation(){
-		return allDeclaratedClasses;
+		return new ArrayList<>(allDeclaratedClasses.values());
 	}
 
 	public List<ClassInformation> getHierarchyTop(){
