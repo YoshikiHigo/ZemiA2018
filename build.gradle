@@ -25,9 +25,16 @@ dependencies {
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
-    
+
     // https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core
     compile group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.13.102'
+
+    // https://mvnrepository.com/artifact/org.apache.poi/poi
+	compile group: 'org.apache.poi', name: 'poi', version: '3.9'
+	compile(group: 'org.apache.poi', name : 'poi-ooxml', version: '3.13') {
+		exclude group: 'stax', module: 'stax-api'
+	}
+
 }
 
 
