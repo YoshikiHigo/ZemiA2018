@@ -372,7 +372,6 @@ public class ClassInformation {
 
 		disharmonyCount += methodDisharmony;
 
-
 		return disharmonyCount;
 	}
 

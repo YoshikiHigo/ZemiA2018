@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.DoStatement;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
@@ -293,14 +294,16 @@ public class ZemiAVisitor extends ASTVisitor {
 	}
 
 	private boolean isProjectMethod(IMethodBinding methodBind) {
-		boolean includeFlag = false;
-		for(MethodInformation declaratedMethod: allDeclaratedMethods.values()) {
-			includeFlag = declaratedMethod.getMethodBinding().equals(methodBind);
-			if(includeFlag == true) {
-				break;
-			}
-		}
-		return includeFlag;
+//		boolean includeFlag = false;
+//		for(MethodInformation declaratedMethod: allDeclaratedMethods.values()) {
+//			includeFlag = declaratedMethod.getMethodBinding().equals(methodBind);
+//			if(includeFlag == true) {
+//				break;
+//			}
+//		}
+//		return includeFlag;
+
+		return !(allDeclaratedMethods.get(methodBind) == null);
 	}
 
 	//TODO legacy
@@ -631,6 +634,15 @@ public class ZemiAVisitor extends ASTVisitor {
 		methodWMC++;
 		return super.visit(node);
 	}
+
+	@Override
+	public boolean visit(EnhancedForStatement node) {
+		// TODO 自動生成されたメソッド・スタブ
+		WMC++;
+		methodWMC++;
+		return super.visit(node);
+	}
+
 	@Override
 	public boolean visit(IfStatement node) {
 		// TODO Auto-generated method stub
@@ -694,7 +706,9 @@ public class ZemiAVisitor extends ASTVisitor {
 //	}
 
 	public List<ClassInformation> getClassInformation(){
-		return new ArrayList<>(allDeclaratedClasses.values());
+		List<ClassInformation> allClasses = new ArrayList<ClassInformation>(allDeclaratedClasses.values());
+		allClasses.sort((s1,s2) -> s1.getName().toString().compareTo(s2.getName().toString()));
+		return allClasses;
 	}
 
 	public List<ClassInformation> getHierarchyTop(){
