@@ -68,11 +68,11 @@ public class ZemiAVisitor extends ASTVisitor {
 	CompilationUnit unit;
 	private IMethodBinding methodname;
 	private ITypeBinding classname;
-	private HashMap<String, Boolean> fieldmap = new HashMap<String, Boolean>();
+	//private HashMap<String, Boolean> fieldmap = new HashMap<String, Boolean>();
 	private ArrayList<String> fieldlist = new ArrayList<String>();
-	private ArrayList<String> methodlist = new ArrayList<String>();
+	//private ArrayList<String> methodlist = new ArrayList<String>();
 	//	private Map<String, Boolean> accessormethodmap = new HashMap<String, Boolean>();
-	private HashMap<String, Integer> methodLOCmap = new HashMap<String, Integer>();
+	//private HashMap<String, Integer> methodLOCmap = new HashMap<String, Integer>();
 	private int publicFunctionalMethod;
 	private int publicMethod;
 	private double woc;
@@ -83,8 +83,8 @@ public class ZemiAVisitor extends ASTVisitor {
 	private int classATFDviaaccessor=0;
 	private int methodATFDdirect=0;
 	private int methodATFDviaaccessor=0;
-	private int foreigndata=0;
-	private int laalocal=0;
+	//private int foreigndata=0;
+	//private int laalocal=0;
 	private int methodWMC = 0;
 	/* ================= */
 
@@ -104,17 +104,17 @@ public class ZemiAVisitor extends ASTVisitor {
 					//以下、FDPを求めるための準備 : via accessor method
 					for(ClassInformation classinformation : allDeclaratedClasses.values()) {
 						if(classinformation.isDefined(calledmethod)) {
-							this.foreigndata+=1;
+							//this.foreigndata+=1;
 							ITypeBinding tb = classinformation.getClassBinding();
 							methodInformation.setProviderClasses(tb);
 						}
 					}
 				}
 				List<String> accessedfield = methodInformation.getAccessedFields();
-				List<ITypeBinding> provider = methodInformation.getProviderClasses();
-				List<String> declaringfield;
+				//List<ITypeBinding> provider = methodInformation.getProviderClasses();
+				//List<String> declaringfield;
 				for(ClassInformation classinformation : allDeclaratedClasses.values()) {
-					declaringfield=classinformation.getDeclaringFieldList();
+					//declaringfield=classinformation.getDeclaringFieldList();
 					for(String field:accessedfield) {
 						//						if(declaringfield.contains(field)) {
 						if(classinformation.isDefined(field)) {
@@ -269,7 +269,7 @@ public class ZemiAVisitor extends ASTVisitor {
 
 		// Set Classes Information
 		for(ClassInformation classInformation: allDeclaratedClasses.values()) {
-			classInformation.setClassMethods(new ArrayList<>(allDeclaratedMethods.values()));
+			classInformation.setClassMethods(allDeclaratedMethods);
 		}
 
 
@@ -418,8 +418,8 @@ public class ZemiAVisitor extends ASTVisitor {
 		methodname = node.resolveBinding();
 		//		accessormethodmap.put(methodname, Boolean.FALSE);
 		//		methodlist.add(methodname);
-		int methodloc = unit.getLineNumber(node.getStartPosition() + node.getLength() - 1) + 1
-				- unit.getLineNumber(node.getStartPosition());
+		/*int methodloc = unit.getLineNumber(node.getStartPosition() + node.getLength() - 1) + 1
+				- unit.getLineNumber(node.getStartPosition());*/
 		//		methodLOCmap.put(methodname, methodloc);
 		for(Object para:node.parameters()) {
 			//			System.out.println(node.parameters());

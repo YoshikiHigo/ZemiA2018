@@ -309,15 +309,16 @@ public class MethodInformation{
 		System.out.println("----------------------------------------------------");
 	}
 
-	public static MethodInformation getMethodInformation(IMethodBinding methodBind, List<MethodInformation> methods) {
-		for(MethodInformation methodInformation: methods) {
-			if(methodInformation.getMethodBinding().equals(methodBind)) {
-				return methodInformation;
-			}
-		}
-		// if the method is not project method
-		return null;
-	}
+	//legacy
+//	public static MethodInformation getMethodInformation(IMethodBinding methodBind, List<MethodInformation> methods) {
+//		for(MethodInformation methodInformation: methods) {
+//			if(methodInformation.getMethodBinding().equals(methodBind)) {
+//				return methodInformation;
+//			}
+//		}
+//		// if the method is not project method
+//		return null;
+//	}
 
 	// TODO メソッドごとの不調和があったらここに追記してください
 	public int numOfDisharmony() {
